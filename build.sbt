@@ -10,6 +10,8 @@ lazy val root = project
 
     libraryDependencies ++= Seq(
       "org.scala-lang" %% "scala3-staging" % scala3Version,
-      "com.novocode" % "junit-interface" % "0.11" % "test"
-    )
+      "com.lihaoyi" %% "utest" % "0.7.10" % "test"
+    ),
+
+    testFrameworks += new TestFramework("utest.runner.Framework")
   )
