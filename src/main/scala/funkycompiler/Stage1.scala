@@ -1,146 +1,96 @@
 package funkycompiler
 
 import scala.quoted.*
-import stage3.{ Tree => S3Tree, Expr => S3Expr, Block => S3Block, * }
+import stage3.{ Tree => S3Tree, Block => S3Block, Variable => S3Variable, Number => S3Number, If => S3If, * }
 
-private class Stage3StatsBuilder():
-  private val stats = collection.mutable.ListBuffer.empty[Stat]
-  def append(stat: Stat): Unit = stats.append(stat)
-  def mkBlockOrStats: S3Block | Stats =
-    println(s"Attempting to make a block/stat of $stats")
-    stats.last match
-      case x: stage3.Expr => S3Block(Stats(stats.toList.dropRight(1)), x)
-      case _ => Stats(stats.toList)
-end Stage3StatsBuilder
+private class S3BlockBuilder:
+  private val stats = collection.mutable.ListBuffer.empty[S3Tree]
+  def append(stat: S3Tree): Unit = stats.append(stat)
+  def mkBlock: S3Block = S3Block(stats.toList)
+end S3BlockBuilder
 
-object SupportedOp:
-  def unapply(str: String): Boolean =
-    Set(">", "<", "<=", ">=", "!=", "==",
-        "+", "-", "*", "/",
-        "&", "|").contains(str)
-end SupportedOp
+def mkS3BlockBuilder(using Quotes): (quotes.reflect.Statement, Expr[S3BlockBuilder]) =
+  import quotes.reflect.*
+  '{ val s3BlockBuilder = new S3BlockBuilder }.asTerm match
+    case Inlined(_, _, Block(valDef :: Nil, _)) =>
+      val expr = Ref(valDef.symbol).asExprOf[S3BlockBuilder]
+      (valDef, expr)
+end mkS3BlockBuilder
 
-class TypeTest[T]:
-  def unapply(using Quotes, Type[T])(t: quotes.reflect.Tree): Boolean =
-    apply(t)
-  def apply(using Quotes, Type[T])(t: quotes.reflect.Tree): Boolean =
-    t match
-      case t: quotes.reflect.Term => t.tpe <:< quotes.reflect.TypeRepr.of[T]
-      case _ => false
-end TypeTest
 
-object IsStage3Tree  extends TypeTest[S3Tree]
-object IsStage3Expr  extends TypeTest[S3Expr]
-object IsStage3Stats extends TypeTest[Stats]
+val supportedBinaryOps = Set(
+  ">", "<", "<=", ">=", "!=", "==",
+  "+", "-", "*", "/",
+  "&", "|")
 
 
 inline def stage(inline expr: Any): Any = ${stageImpl('expr)}
 def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
   import quotes.reflect.*
-  def asFTExpr(t: Term): Expr[S3Expr] =
-    if t.tpe <:< TypeRepr.of[S3Expr] then t.asExprOf[S3Expr]
-    else if t.tpe <:< TypeRepr.of[Double] then '{LNumber(${t.asExprOf[Double]})}
-    else throw RuntimeException("Only numbers can be automatically converted to funky trees")
-    // '{
-    //   if $tExpr.isInstanceOf[S3Expr] then $tExpr.asInstanceOf[S3Expr]
-    //   else if $tExpr.isInstanceOf[Double] then LNumber($tExpr.asInstanceOf[Double])
-    // }
-      // '{ ${t.asExpr} match
-      //   case t: S3Expr => t
-      //   case n: Double => LNumber(n)
-      // }
-  def asFTStats(t: Term) = t.asExprOf[Stats]
 
-  /** Interprets Scala blocks or terms to Stage 2 blocks or stats. */
-  object blockInterpreter extends TreeMap:
-    override def transformTerm(t: Term)(owner: Symbol): Term =
-      def withExprInterpreter(transform: ExprInterpreter => List[Statement]): Term =
-        '{ val stage2StatsBuilder = new Stage3StatsBuilder }.asTerm match
-          case Inlined(_, _, Block(valDef :: Nil, _)) =>
-            val statsBuilderDefTree: Statement = valDef.asInstanceOf[Statement]
-            val statsBuilderHandle: Term = Ref(statsBuilderDefTree.symbol)
-            val statsResult: Expr[S3Block | Stats] =
-              '{${statsBuilderHandle.asExprOf[Stage3StatsBuilder]}
-                .mkBlockOrStats}
-            val exprInterp = ExprInterpreter(statsBuilderHandle.asExprOf[Stage3StatsBuilder])
+  extension (t: Tree)
+    def isS3: Boolean = t match
+      case t: Term => t.tpe <:< TypeRepr.of[S3Tree]
+      case _ => false
 
-            val transformed = transform(exprInterp)
-            if exprInterp.transformationDone then
-              if exprInterp.statsNonEmpty then
-                Block(statsBuilderDefTree :: transformed, statsResult.asTerm)
-              else transformed match
-                case x :: Nil => x.asInstanceOf[Term]
-                case _ => Block(transformed.dropRight(1), transformed.last.asInstanceOf[Term])
-            else super.transformTerm(t)(owner)
-      end withExprInterpreter
+    def maybeS3: Expr[S3Tree] | Null = t match
+      case t: Term =>
+        if t.isS3 then t.asExprOf[S3Tree]
+        else if t.tpe <:< TypeRepr.of[Double] then '{S3Number(${t.asExprOf[Double]})}
+        else null
+      case _ => null
 
-      t match
-        case Block(stats, result) =>
-          withExprInterpreter(_.transformStats(stats :+ result)(owner))
+    def asS3: Expr[S3Tree] = t.maybeS3 match
+      case null => throw RuntimeException("Only numbers can be automatically converted to funky trees")
+      case x => x
+  end extension
 
-        case t =>
-          withExprInterpreter(_.transformTerm(t)(owner) :: Nil)
-  end blockInterpreter
-
-  /** Interprets Scala expressions to Stage 2 expressions. */
-  class ExprInterpreter(statsBuilderExpr: Expr[Stage3StatsBuilder]) extends TreeMap:
-    private var _transformationDone = false
-    private var _statsNonEmpty = false
-
-    def transformationDone = _transformationDone
-    def statsNonEmpty = _statsNonEmpty
-    def flagTransformation(): Unit = _transformationDone = true
-
-    private def appendStat(stat: Expr[Stat]) =
-      _transformationDone = true
-      _statsNonEmpty = true
-      '{ $statsBuilderExpr.append($stat) }
-
+  /** Interprets Scala expressions to Stage 3 expressions. */
+  object stage3Interpreter extends TreeMap:
     override def transformTerm(t: Term)(owner: Symbol): Term = t match
       case Block(stats, res) =>
-        blockInterpreter.transformTerm(t)(owner)
+        val tStats = transformStats(stats)(owner)
+        val tRes = transformTerm(res)(owner)
 
-      // a > b => Operator
-      case Apply(Apply(Ident(op@SupportedOp()), arg1 :: Nil), arg2 :: Nil) =>
-        val tArg1 = transformTerm(arg1)(owner)
-        val tArg2 = transformTerm(arg2)(owner)
+        if tStats.exists(_.isS3) then
+          val (builderDef, builderExpr) = mkS3BlockBuilder
+          val tStatsRecorded = for stat <- (tStats :+ tRes) yield
+            stat.maybeS3 match
+              case null => stat
+              case stat => '{ $builderExpr.append($stat) }.asTerm
+          Block.copy(t)(builderDef :: tStatsRecorded, '{$builderExpr.mkBlock}.asTerm)
+        else Block.copy(t)(tStats, tRes)
 
-        if IsStage3Tree(tArg1) || IsStage3Tree(tArg2) then
-          flagTransformation()
-          val op1 = if IsStage3Tree(tArg1) then asFTExpr(tArg1) else '{LNumber(${tArg1.asExprOf[Double]})}
-          val op2 = if IsStage3Tree(tArg2) then asFTExpr(tArg2) else '{LNumber(${tArg2.asExprOf[Double]})}
-          '{BinaryOp($op1, $op2, ${Expr(op)})}.asTerm
+      // a > b => BinaryOp
+      case Apply(Apply(Ident(op), lhs :: Nil), rhs :: Nil)
+      if supportedBinaryOps(op) =>
+        val tLhs = transformTerm(lhs)(owner)
+        val tRhs = transformTerm(rhs)(owner)
+
+        if tLhs.isS3 || tRhs.isS3 then
+          '{BinaryOp(${tLhs.asS3}, ${tRhs.asS3}, ${Expr(op)})}.asTerm
         else super.transformTerm(t)(owner)
 
-      // a := b => Assignment
-      case Apply(Apply(Ident(":="), (arg1@IsStage3Tree()) :: Nil), arg2 :: Nil) =>
-        val tArg2 = transformTerm(arg2)(owner)
-        appendStat('{Assignment(${arg1.asExprOf[Variable]}, ${asFTExpr(tArg2)})}).asTerm
+      // a := b => statsBuilder.append(Assignment)
+      case Apply(Apply(Ident(":="), lhs :: Nil), rhs :: Nil)
+        if lhs.tpe <:< TypeRepr.of[S3Variable] =>
+        val tRhs = transformTerm(rhs)(owner)
+        '{Assignment(${lhs.asExprOf[S3Variable]}, ${tRhs.asS3})}.asTerm
 
-      // if a then ... else ... => If(a, ..., ...)
-      case If(p, pos, neg) =>
-        val tP   = transformTerm(p)(owner)
-        val tPos = blockInterpreter.transformTerm(pos)(owner).asExprOf[S3Block | Stats]
-        val tNeg = blockInterpreter.transformTerm(neg)(owner).asExprOf[S3Block | Stats]
-
-        if IsStage3Tree(tP) then
-          flagTransformation()
-          val tPExpr: Expr[S3Expr] = asFTExpr(tP)
-          '{
-            ($tPos, $tNeg) match
-              case (pos: S3Expr, neg: S3Expr) => IfExpr($tPExpr, pos, neg)
-              case (pos: Stats, neg: Stats) => IfStat($tPExpr, pos, neg)
-              case _ => throw RuntimeException("Both branches of if statement must either be expressions or statements")
-          }.asTerm
-        else super.transformTerm(t)(owner)
+      // if a then ... else ... => If
+      case If(p, pos, neg) => transformTerm(p)(owner).maybeS3 match
+        case null => super.transformTerm(t)(owner)
+        case tPExpr =>
+          val tPos = transformTerm(pos)(owner).asS3
+          val tNeg = transformTerm(neg)(owner).asS3
+          '{S3If($tPExpr, $tPos, $tNeg)}.asTerm
 
       // TODO funkylib.square(...)
       case _ => super.transformTerm(t)(owner)
-  end ExprInterpreter
+  end stage3Interpreter
 
   // println(s"Input:\n${expr.asTerm}\n\n")
-  val out = blockInterpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner)
-    .asExpr
+  val out = stage3Interpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner).asExpr
   println(s"Output:\n${out.show}")
   out
 end stageImpl
