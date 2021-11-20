@@ -1,5 +1,5 @@
 ## Funky Trees Compiler
-This is a runtime-staged compiler that compiles Scala 3 to [Simple Planes'](https://www.simpleplanes.com/) [Funky Trees](https://snowflake0s.github.io/funkyguide/).
+This is a runtime-staged compiler that compiles Scala 3 to [Simple Planes'](https://www.simpleplanes.com/) [Funky Trees](https://snowflake0s.github.io/funkyguide/). Based on [LMS work](https://infoscience.epfl.ch/record/150347).
 
 Stages:
 1. Scala Macros: Scala program -> Scala program that produces Funky Trees IR
