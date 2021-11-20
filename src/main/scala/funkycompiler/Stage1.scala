@@ -45,7 +45,6 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
       case x => x
   end extension
 
-  /** Interprets Scala expressions to Stage 3 expressions. */
   object stage3Interpreter extends TreeMap:
     override def transformTerm(t: Term)(owner: Symbol): Term = t match
       case Block(stats, res) =>
@@ -61,7 +60,6 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
           Block.copy(t)(builderDef :: tStatsRecorded, '{$builderExpr.mkBlock}.asTerm)
         else Block.copy(t)(tStats, tRes)
 
-      // a > b => BinaryOp
       case Apply(Apply(Ident(op), lhs :: Nil), rhs :: Nil)
       if supportedBinaryOps(op) =>
         val tLhs = transformTerm(lhs)(owner)
@@ -71,13 +69,11 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
           '{BinaryOp(${tLhs.asS3}, ${tRhs.asS3}, ${Expr(op)})}.asTerm
         else super.transformTerm(t)(owner)
 
-      // a := b => statsBuilder.append(Assignment)
       case Apply(Apply(Ident(":="), lhs :: Nil), rhs :: Nil)
         if lhs.tpe <:< TypeRepr.of[S3Variable] =>
         val tRhs = transformTerm(rhs)(owner)
         '{Assignment(${lhs.asExprOf[S3Variable]}, ${tRhs.asS3})}.asTerm
 
-      // if a then ... else ... => If
       case If(p, pos, neg) => transformTerm(p)(owner).maybeS3 match
         case null => super.transformTerm(t)(owner)
         case tPExpr =>
@@ -85,11 +81,9 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
           val tNeg = transformTerm(neg)(owner).asS3
           '{S3If($tPExpr, $tPos, $tNeg)}.asTerm
 
-      // TODO funkylib.square(...)
       case _ => super.transformTerm(t)(owner)
   end stage3Interpreter
 
-  // println(s"Input:\n${expr.asTerm}\n\n")
   val out = stage3Interpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner).asExpr
   println(s"Output:\n${out.show}")
   out

@@ -1,9 +1,8 @@
-## Dotty Staging template project
+## Funky Trees Compiler
+This is a runtime-staged compiler that compiles Scala 3 to [Simple Planes'](https://www.simpleplanes.com/) [Funky Trees](https://snowflake0s.github.io/funkyguide/).
 
-### Usage
-
-This is a normal sbt project, you can compile code with `sbt compile` and run it
-with `sbt run`, `sbt console` will start a Dotty REPL.
-
-For more information on the sbt-dotty plugin, see the
-[dotty-example-project](https://github.com/lampepfl/dotty-example-project/blob/master/README.md).
+Stages:
+1. Scala Macros: Scala program -> Scala program that produces Funky Trees IR
+2. Scala Runtime: Program from (1) -> Funky Trees IR
+3. IR compilation: IR (2) -> Funky Trees AST
+4. Output: AST (3) -> XML, ready to use in the game
