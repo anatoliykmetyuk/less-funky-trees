@@ -7,6 +7,7 @@ private class Stage3StatsBuilder():
   private val stats = collection.mutable.ListBuffer.empty[Stat]
   def append(stat: Stat): Unit = stats.append(stat)
   def mkBlockOrStats: S3Block | Stats =
+    println(s"Attempting to make a block/stat of $stats")
     stats.last match
       case x: stage3.Expr => S3Block(Stats(stats.toList.dropRight(1)), x)
       case _ => Stats(stats.toList)
@@ -53,7 +54,7 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
   /** Interprets Scala blocks or terms to Stage 2 blocks or stats. */
   object blockInterpreter extends TreeMap:
     override def transformTerm(t: Term)(owner: Symbol): Term =
-      def withExprInterpreter(transform: ExprInterpreter => List[Statement]) =
+      def withExprInterpreter(transform: ExprInterpreter => List[Statement]): Term =
         '{ val stage2StatsBuilder = new Stage3StatsBuilder }.asTerm match
           case Inlined(_, _, Block(valDef :: Nil, _)) =>
             val statsBuilderDefTree: Statement = valDef.asInstanceOf[Statement]
@@ -65,7 +66,11 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
 
             val transformed = transform(exprInterp)
             if exprInterp.transformationDone then
-              Block(statsBuilderDefTree :: transformed, statsResult.asTerm)
+              if exprInterp.statsNonEmpty then
+                Block(statsBuilderDefTree :: transformed, statsResult.asTerm)
+              else transformed match
+                case x :: Nil => x.asInstanceOf[Term]
+                case _ => Block(transformed.dropRight(1), transformed.last.asInstanceOf[Term])
             else super.transformTerm(t)(owner)
       end withExprInterpreter
 
@@ -80,11 +85,15 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
   /** Interprets Scala expressions to Stage 2 expressions. */
   class ExprInterpreter(statsBuilderExpr: Expr[Stage3StatsBuilder]) extends TreeMap:
     private var _transformationDone = false
+    private var _statsNonEmpty = false
+
     def transformationDone = _transformationDone
+    def statsNonEmpty = _statsNonEmpty
     def flagTransformation(): Unit = _transformationDone = true
 
     private def appendStat(stat: Expr[Stat]) =
       _transformationDone = true
+      _statsNonEmpty = true
       '{ $statsBuilderExpr.append($stat) }
 
     override def transformTerm(t: Term)(owner: Symbol): Term = t match

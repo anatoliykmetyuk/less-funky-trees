@@ -11,19 +11,13 @@ extension (n: Double)
   def /(t: Tree) = compilerError
 
 extension (n: Tree)
-  def +(t: Tree) = compilerError
-  def +(t: Double)    = compilerError
-  def -(t: Tree) = compilerError
-  def -(t: Double)    = compilerError
-  def *(t: Tree) = compilerError
-  def *(t: Double)    = compilerError
-  def /(t: Tree) = compilerError
-  def /(t: Double)    = compilerError
+  def +(t: Tree | Double) = compilerError
+  def -(t: Tree | Double) = compilerError
+  def *(t: Tree | Double) = compilerError
+  def /(t: Tree | Double) = compilerError
 
-  def <(t: Tree) = compilerError
-  def <(t: Double)    = compilerError
-  def >(t: Tree) = compilerError
-  def >(t: Double)    = compilerError
+  def <(t: Tree | Double) = compilerError
+  def >(t: Tree | Double) = compilerError
 
 extension (v: Variable)
   def :=(value: Tree | Double): Tree = compilerError
