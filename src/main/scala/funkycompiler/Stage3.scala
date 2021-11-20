@@ -1,6 +1,6 @@
 package funkycompiler
 
-object stage2:
+object stage3:
   sealed trait Tree
   case class Stats(ss: List[Stat]) extends Tree
 
@@ -15,7 +15,7 @@ object stage2:
   case class Assignment(lhs: Variable, rhs: Expr) extends Stat
   case class IfStat(p: Expr, lhs: Stats, rhs: Stats) extends Stat
 
-def compile(ft: stage2.Tree): String = ???
+// def compile(ft: stage2.Tree): String = ???
 //   case Variable(v) => v
 //   case Call(f, args) =>
 //     s"$f(${args.map(compile).mkString(",")})"

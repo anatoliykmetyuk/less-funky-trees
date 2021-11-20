@@ -1,6 +1,6 @@
 package funkycompiler
 
-import stage2.*
+import stage3.*
 
 def compilerError = throw RuntimeException("Compiler error: method wasn't interpreted")
 
@@ -26,4 +26,4 @@ extension (n: Tree)
   def >(t: Double)    = compilerError
 
 extension (v: Variable)
-  def :=(value: Tree): Tree = compilerError
+  def :=(value: Tree | Double): Tree = compilerError
