@@ -2,22 +2,30 @@ package funkycompiler
 
 import stage3.*
 
-def compilerError = throw RuntimeException("Compiler error: method wasn't interpreted")
+def toBeExpanded = throw RuntimeException("Method wasn't expanded by the compiler")
 
-extension (n: Double)
-  def +(t: Tree) = compilerError
-  def -(t: Tree) = compilerError
-  def *(t: Tree) = compilerError
-  def /(t: Tree) = compilerError
+given Conversion[Double, Number] = Number(_)
+given Conversion[Int, Number] = Number(_)
+given Conversion[Tree, Boolean] = toBeExpanded
 
 extension (n: Tree)
-  def +(t: Tree | Double) = compilerError
-  def -(t: Tree | Double) = compilerError
-  def *(t: Tree | Double) = compilerError
-  def /(t: Tree | Double) = compilerError
+  def +(t: Tree) = BinaryOp(n, t, "+")
+  def -(t: Tree) = BinaryOp(n, t, "-")
+  def *(t: Tree) = BinaryOp(n, t, "*")
+  def /(t: Tree) = BinaryOp(n, t, "/")
 
-  def <(t: Tree | Double) = compilerError
-  def >(t: Tree | Double) = compilerError
+  def <(t: Tree) = BinaryOp(n, t, "<")
+  def >(t: Tree) = BinaryOp(n, t, ">")
+  def <=(t: Tree) = BinaryOp(n, t, "<=")
+  def >=(t: Tree) = BinaryOp(n, t, ">=")
+  def !=(t: Tree) = BinaryOp(n, t, "!=")
+  def ==(t: Tree) = BinaryOp(n, t, "==")
+
+  def &(t: Tree) = BinaryOp(n, t, "&")
+  def |(t: Tree) = BinaryOp(n, t, "|")
+
+  def unary_! = UnaryOp(n, "!")
+end extension
 
 extension (v: Variable)
-  def :=(value: Tree | Double): Tree = compilerError
+  def :=(value: Tree): Tree = Assignment(v, value)

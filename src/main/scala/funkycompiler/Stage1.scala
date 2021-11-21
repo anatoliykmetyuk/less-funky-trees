@@ -18,12 +18,6 @@ def mkS3BlockBuilder(using Quotes): (quotes.reflect.Statement, Expr[S3BlockBuild
 end mkS3BlockBuilder
 
 
-val supportedBinaryOps = Set(
-  ">", "<", "<=", ">=", "!=", "==",
-  "+", "-", "*", "/",
-  "&", "|")
-
-
 inline def stage(inline expr: Any): Any = ${stageImpl('expr)}
 def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
   import quotes.reflect.*
@@ -47,6 +41,9 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
 
   object stage3Interpreter extends TreeMap:
     override def transformTerm(t: Term)(owner: Symbol): Term = t match
+      case Apply(Select(Ident("given_Conversion_Tree_Boolean"), "apply")
+        , s3tree :: Nil) => s3tree
+
       case Block(stats, res) =>
         val tStats = transformStats(stats)(owner)
         val tRes = transformTerm(res)(owner)
@@ -60,22 +57,10 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
           Block.copy(t)(builderDef :: tStatsRecorded, '{$builderExpr.mkBlock}.asTerm)
         else Block.copy(t)(tStats, tRes)
 
-      case Apply(Apply(Ident(op), lhs :: Nil), rhs :: Nil)
-      if supportedBinaryOps(op) =>
-        val tLhs = transformTerm(lhs)(owner)
-        val tRhs = transformTerm(rhs)(owner)
-
-        if tLhs.isS3 || tRhs.isS3 then
-          '{BinaryOp(${tLhs.asS3}, ${tRhs.asS3}, ${Expr(op)})}.asTerm
-        else super.transformTerm(t)(owner)
-
-      case Apply(Apply(Ident(":="), lhs :: Nil), rhs :: Nil)
-        if lhs.tpe <:< TypeRepr.of[S3Variable] =>
-        val tRhs = transformTerm(rhs)(owner)
-        '{Assignment(${lhs.asExprOf[S3Variable]}, ${tRhs.asS3})}.asTerm
-
       case If(p, pos, neg) => transformTerm(p)(owner).maybeS3 match
-        case null => super.transformTerm(t)(owner)
+        case null =>
+          println(s"p = ${p.asExpr.show}\nTerm: ${p}")
+          super.transformTerm(t)(owner)
         case tPExpr =>
           val tPos = transformTerm(pos)(owner).asS3
           val tNeg = transformTerm(neg)(owner).asS3
@@ -85,6 +70,6 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
   end stage3Interpreter
 
   val out = stage3Interpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner).asExpr
-  println(s"Output:\n${out.show}")
+  // println(s"Output:\n${out.show}")
   out
 end stageImpl
