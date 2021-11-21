@@ -21,4 +21,8 @@ object Stage4Suite extends TestSuite:
     test("calls") {
       stage4.mkXml(stage3.mkVarDefs(stage(calls))).toString ==> ""
     }
+
+    test("loop unrolling") {
+      stage4.mkXml(stage3.mkVarDefs(stage(loopUnrolling))).toString ==> ""
+    }
   }

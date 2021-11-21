@@ -21,4 +21,8 @@ object Stage3Suite extends TestSuite:
     test("calls") {
       stage3.mkVarDefs(stage(calls)).toString ==> "VarDefs(List(VarDef(x,Call(abs,List(Const(25.0))),null)))"
     }
+
+    test("loop unrolling") {
+      stage3.mkVarDefs(stage(loopUnrolling)).toString ==> "VarDefs(List(VarDef(x,Const(1.0),null), VarDef(x,Const(2.0),null), VarDef(x,Const(3.0),null), VarDef(x,Const(4.0),null), VarDef(x,Const(5.0),null)))"
+    }
   }

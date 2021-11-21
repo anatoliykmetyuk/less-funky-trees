@@ -9,9 +9,11 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
   import quotes.reflect.*
 
   extension (t: Tree)
-    def isS3: Boolean = t match
-      case t: Term => t.tpe <:< TypeRepr.of[s3.Tree]
+    def is[T: Type] = t match
+      case t: Term => t.tpe <:< TypeRepr.of[T]
       case _ => false
+
+    def isS3: Boolean = t.is[s3.Tree]
 
     def maybeS3: Expr[s3.Tree] | Null =
       if t.isS3 then t.asS3 else null
@@ -26,8 +28,16 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
         , s3tree :: Nil) => s3tree
 
       case Block(stats, res) =>
-        val tStats = transformStats(stats)(owner)
-        val tRes = transformTerm(res)(owner)
+        def treeTermsToBlockTerm(t: Term): Term = t match
+          case t: Term if t.is[Seq[s3.Tree]] =>
+            '{treesToBlock(${t.asExprOf[Seq[s3.Tree]]})}.asTerm
+          case t => t
+
+        val tStats = transformStats(stats)(owner).map {
+          case t: Term => treeTermsToBlockTerm(t)
+          case s => s
+        }
+        val tRes = treeTermsToBlockTerm(transformTerm(res)(owner))
 
         if tStats.exists(_.isS3) then
           val tStatsRecorded = Expr.ofList((tStats :+ tRes).collect {

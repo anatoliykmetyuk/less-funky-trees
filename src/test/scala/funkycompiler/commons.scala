@@ -41,3 +41,8 @@ object testPrograms:
   transparent inline def calls =
     val x = Variable("x")
     x := abs(25)
+
+  transparent inline def loopUnrolling =
+    val x = Variable("x")
+    for i <- 1 to 5 yield
+      x := i

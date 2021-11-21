@@ -21,5 +21,9 @@ object Stage12Suite extends TestSuite:
     test("calls") {
       stage(calls).toString ==> "Assignment(Variable(x),Call(abs,List(Const(25.0))))"
     }
+
+    test("loop unrolling") {
+      stage(loopUnrolling).toString ==> "Block(List(Assignment(Variable(x),Const(1.0)), Assignment(Variable(x),Const(2.0)), Assignment(Variable(x),Const(3.0)), Assignment(Variable(x),Const(4.0)), Assignment(Variable(x),Const(5.0))))"
+    }
   }
 end Stage12Suite
