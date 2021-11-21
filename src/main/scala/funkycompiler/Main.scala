@@ -11,10 +11,8 @@ import stage4.mkXml
 @main def main =
   println(mkXml(mkVarDefs(stage {
     val x = Variable("x")
-    x := { if x === 30 then 10 else 20 }
-    if x === 30 then
-      x := 40
+    if x < 500 then
+      x := x + 1
     else
-      x := x
-    50
+      x := 0
   })))

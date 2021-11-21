@@ -55,7 +55,7 @@ object stage3:
   extension (ds: List[s4.VarDef]) def withCondition(expr: s4.Expr) =
     ds.map(d =>
       val newCond =
-        if d.condition != null then s4.BinaryOp(expr, d.condition, "&")
+        if d.condition != null then s4.BinaryOp(expr, d.condition, "&amp;")
         else expr
       d.copy(condition = newCond))
 

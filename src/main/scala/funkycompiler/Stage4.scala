@@ -19,11 +19,11 @@ object stage4:
 
     case VarDef(name, expr, condition) =>
       val maybeActivator = if condition != null then s"""activator="${mkXml(condition)}" """ else ""
-      s"""  <Setter name="$name" value="${mkXml(expr)}" $maybeActivator/>"""
+      s"""  <Setter variable="$name" function="${mkXml(expr)}" $maybeActivator/>"""
 
     case Const(x) => x.toString
     case VarRef(name) => name
-    case BinaryOp(lhs, rhs, sign) => s"(${mkXml(lhs)}${sign}${mkXml(rhs)})"
+    case BinaryOp(lhs, rhs, sign) => s"(${mkXml(lhs)} ${sign} ${mkXml(rhs)})"
     case UnaryOp(rhs, sign) => s"(${sign}${mkXml(rhs)})"
     case If(cnd, lhs, rhs) =>
       if rhs == null then
