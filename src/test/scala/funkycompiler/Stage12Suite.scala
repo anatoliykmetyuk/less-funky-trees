@@ -2,6 +2,7 @@ package funkycompiler
 
 import utest._
 import stage3.*
+import stdlib.*
 
 object Stage12Suite extends TestSuite:
   val tests = Tests {
@@ -14,10 +15,6 @@ object Stage12Suite extends TestSuite:
     }
 
     test("nested if statement") {
-      val Pitch = Variable("Pitch")
-      val VTOL = Variable("VTOL")
-      val PitchRate = Variable("PitchRate")
-
       stage {
         val Flaps = Variable("Flaps")
         val Autotrim = Variable("Autotrim")
