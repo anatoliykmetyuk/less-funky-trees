@@ -10,17 +10,15 @@ import stage4.mkXml
 
 // @main def main =
 //   println(mkXml(mkVarDefs(stage {
-//     val x = Variable("x")
-//     if x < 500 then
-//       x := x + 1
-//     else
-//       x := 0
 //   })))
 
 @main def main =
-  println(mkXml(mkVarDefs(stage {
+  val testPlane = java.io.File("/Users/kmetiuk/Library/Application Support/unity.Jundroo.SimplePlanes/AircraftDesigns/Test Plane.xml")
+  val program = mkXml(mkVarDefs(stage {
     val x = Variable("x")
-    List(x := 1, x := 2)
-    for i <- 1 to 5 yield
-      x := i
-  })))
+    if x < 500 then
+      x := x + 1
+    else
+      x := 0
+  }))
+  writeVariables(testPlane, program)

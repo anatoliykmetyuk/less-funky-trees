@@ -8,7 +8,7 @@ lazy val root = project
 
     scalaVersion := scala3Version,
 
-    scalacOptions += "-Yexplicit-nulls",
+    // scalacOptions += "-Yexplicit-nulls",
 
     libraryDependencies ++= Seq(
       "org.scala-lang" %% "scala3-staging" % scala3Version,
