@@ -4,8 +4,9 @@ import stage3.*
 
 def toBeExpanded = throw RuntimeException("Method wasn't expanded by the compiler")
 
-given Conversion[Double, Number] = Number(_)
-given Conversion[Int, Number] = Number(_)
+given Conversion[Double, Const] = Const(_)
+given Conversion[Int, Const] = Const(_)
+given Conversion[Boolean, Const] = Const(_)
 given Conversion[Tree, Boolean] = toBeExpanded
 
 extension (n: Tree)
@@ -31,4 +32,4 @@ extension (v: Variable) def :=(value: Tree) =
   Assignment(v, value)
 
 extension (f: Function) def apply(values: Tree*) =
-  Call(f, values.toList)
+  Call(f.name, values.toList)

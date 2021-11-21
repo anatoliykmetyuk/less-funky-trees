@@ -1,9 +1,9 @@
 package funkycompiler
 
-import stage3.Variable
+import stage3.{ Variable, mkVarDefs }
 
 @main def main =
-  println(stage {
+  println(mkVarDefs(stage {
     val x = Variable("x")
     x := { if x === 30 then 10 else 20 }
     if x === 30 then
@@ -11,4 +11,4 @@ import stage3.Variable
     else
       x := x
     50
-  })
+  }))
