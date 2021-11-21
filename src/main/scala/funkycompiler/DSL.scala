@@ -18,8 +18,8 @@ extension (n: Tree)
   def >(t: Tree) = BinaryOp(n, t, ">")
   def <=(t: Tree) = BinaryOp(n, t, "<=")
   def >=(t: Tree) = BinaryOp(n, t, ">=")
-  def !=(t: Tree) = BinaryOp(n, t, "!=")
-  def ==(t: Tree) = BinaryOp(n, t, "==")
+  def !==(t: Tree) = BinaryOp(n, t, "!=")
+  def ===(t: Tree) = BinaryOp(n, t, "==")
 
   def &(t: Tree) = BinaryOp(n, t, "&")
   def |(t: Tree) = BinaryOp(n, t, "|")
@@ -27,5 +27,8 @@ extension (n: Tree)
   def unary_! = UnaryOp(n, "!")
 end extension
 
-extension (v: Variable)
-  def :=(value: Tree): Tree = Assignment(v, value)
+extension (v: Variable) def :=(value: Tree) =
+  Assignment(v, value)
+
+extension (f: Function) def apply(values: Tree*) =
+  Call(f, values.toList)

@@ -18,8 +18,8 @@ def mkS3BlockBuilder(using Quotes): (quotes.reflect.Statement, Expr[S3BlockBuild
 end mkS3BlockBuilder
 
 
-inline def stage(inline expr: Any): Any = ${stageImpl('expr)}
-def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
+inline def stage(inline expr: Any): S3Tree = ${stageImpl('expr)}
+def stageImpl(expr: Expr[Any])(using Quotes): Expr[S3Tree] =
   import quotes.reflect.*
 
   extension (t: Tree)
@@ -27,16 +27,11 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
       case t: Term => t.tpe <:< TypeRepr.of[S3Tree]
       case _ => false
 
-    def maybeS3: Expr[S3Tree] | Null = t match
-      case t: Term =>
-        if t.isS3 then t.asExprOf[S3Tree]
-        else if t.tpe <:< TypeRepr.of[Double] then '{S3Number(${t.asExprOf[Double]})}
-        else null
-      case _ => null
+    def maybeS3: Expr[S3Tree] | Null =
+      if t.isS3 then t.asS3 else null
 
-    def asS3: Expr[S3Tree] = t.maybeS3 match
-      case null => throw RuntimeException("Only numbers can be automatically converted to funky trees")
-      case x => x
+    def asS3: Expr[S3Tree] =
+      t.asExprOf[S3Tree]
   end extension
 
   object stage3Interpreter extends TreeMap:
@@ -58,18 +53,18 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[Any] =
         else Block.copy(t)(tStats, tRes)
 
       case If(p, pos, neg) => transformTerm(p)(owner).maybeS3 match
-        case null =>
-          println(s"p = ${p.asExpr.show}\nTerm: ${p}")
-          super.transformTerm(t)(owner)
+        case null => super.transformTerm(t)(owner)
         case tPExpr =>
           val tPos = transformTerm(pos)(owner).asS3
-          val tNeg = transformTerm(neg)(owner).asS3
+          val tNeg = transformTerm(neg)(owner) match
+            case Literal(UnitConstant()) => '{null}
+            case x => x.asS3
           '{S3If($tPExpr, $tPos, $tNeg)}.asTerm
 
       case _ => super.transformTerm(t)(owner)
   end stage3Interpreter
 
-  val out = stage3Interpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner).asExpr
+  val out = stage3Interpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner).asExprOf[S3Tree]
   // println(s"Output:\n${out.show}")
   out
 end stageImpl
