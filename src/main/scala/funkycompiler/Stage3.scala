@@ -43,7 +43,7 @@ object stage3:
       val (lhsDefs, lhsExpr) = interpret(lhs)
       val (rhsDefs, rhsExpr) =
           if rhs != null then interpret(rhs) else (Nil, null)
-      (cndDefs ++ lhsDefs.withCondition(cndExpr) ++ rhsDefs.withCondition(cndExpr),
+      (cndDefs ++ lhsDefs.withCondition(cndExpr) ++ rhsDefs.withCondition(s4.UnaryOp(cndExpr, "!")),
         s4.If(cndExpr, lhsExpr, rhsExpr))
 
     case Block(stats) =>
@@ -53,6 +53,10 @@ object stage3:
   end interpret
 
   extension (ds: List[s4.VarDef]) def withCondition(expr: s4.Expr) =
-    ds.map(_.copy(condition = expr))
+    ds.map(d =>
+      val newCond =
+        if d.condition != null then s4.BinaryOp(expr, d.condition, "&")
+        else expr
+      d.copy(condition = newCond))
 
   def mkVarDefs(t: Tree) = s4.VarDefs(interpret(t)._1)

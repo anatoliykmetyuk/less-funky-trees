@@ -1,9 +1,6 @@
 package funkycompiler
 
 import utest._
-import stage3.Variable
-import stdlib.*
-
 import testPrograms.*
 
 
