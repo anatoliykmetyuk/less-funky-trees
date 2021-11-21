@@ -23,12 +23,12 @@ object stage4:
 
     case Const(x) => x.toString
     case VarRef(name) => name
-    case BinaryOp(lhs, rhs, sign) => s"(${mkXml(lhs)})$sign(${mkXml(rhs)})"
-    case UnaryOp(rhs, sign) => s"${sign}(${mkXml(rhs)})"
+    case BinaryOp(lhs, rhs, sign) => s"(${mkXml(lhs)}${sign}${mkXml(rhs)})"
+    case UnaryOp(rhs, sign) => s"(${sign}${mkXml(rhs)})"
     case If(cnd, lhs, rhs) =>
       if rhs == null then
         throw RuntimeException("If you are using `if` to compute a value, " +
           "it must have both `then` and `else` branches")
-      s"(${mkXml(cnd)})?(${mkXml(lhs)}):(${mkXml(rhs)})"
+      s"(${mkXml(cnd)}?${mkXml(lhs)}:${mkXml(rhs)})"
 
     case Call(name, args) => s"$name(${args.map(mkXml).mkString(",")})"
