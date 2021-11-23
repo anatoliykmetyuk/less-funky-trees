@@ -32,7 +32,7 @@ extension (n: Tree)
 end extension
 
 extension (v: Variable)
-  def :=(value: Tree) = Assignment(v, value)
+  def :=(value: Tree) = Block(List(Assignment(v, value),v))
   def :+=(value: Tree) = v := v + value
   def :-=(value: Tree) = v := v - value
   def :/=(value: Tree) = v := v / value
