@@ -48,4 +48,6 @@ inline def program(plane: File)(inline expr: Any): Unit =
   val xml = stage4.mkXml(stage3.mkVarDefs(stage(expr)))
   writeVariables(plane, xml)
 
+def freshVar = Variable(util.Random.alphanumeric.filter(_.isLetter)
+  .take(10).mkString)
 def defineVariable(initialValue: Tree) = ??? // todo
