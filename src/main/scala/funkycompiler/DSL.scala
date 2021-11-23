@@ -41,6 +41,9 @@ extension (v: Variable)
 extension (f: Function) def apply(values: Tree*) =
   Call(f.name, values.toList)
 
+extension (ts: Seq[Tree]) def sumTrees =
+  ts.foldLeft(0: Tree) { case (accum, t) => accum + t }
+
 inline def program(plane: File)(inline expr: Any): Unit =
   val xml = stage4.mkXml(stage3.mkVarDefs(stage(expr)))
   writeVariables(plane, xml)

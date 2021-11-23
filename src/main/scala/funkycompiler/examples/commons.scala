@@ -4,6 +4,7 @@ package examples
 import stdlib.*
 import stage3.*
 
+val testPlane = java.io.File("/Users/kmetiuk/Library/Application Support/unity.Jundroo.SimplePlanes/AircraftDesigns/Test Plane.xml")
 
 val elevators = Variable("elevators")
 val ailerons = Variable("ailerons")
