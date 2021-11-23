@@ -31,8 +31,12 @@ extension (n: Tree)
   def unary_! = UnaryOp(n, "!")
 end extension
 
-extension (v: Variable) def :=(value: Tree) =
-  Assignment(v, value)
+extension (v: Variable)
+  def :=(value: Tree) = Assignment(v, value)
+  def :+=(value: Tree) = v := v + value
+  def :-=(value: Tree) = v := v - value
+  def :/=(value: Tree) = v := v / value
+  def :*=(value: Tree) = v := v * value
 
 extension (f: Function) def apply(values: Tree*) =
   Call(f.name, values.toList)
@@ -40,3 +44,5 @@ extension (f: Function) def apply(values: Tree*) =
 inline def program(plane: File)(inline expr: Any): Unit =
   val xml = stage4.mkXml(stage3.mkVarDefs(stage(expr)))
   writeVariables(plane, xml)
+
+def defineVariable(initialValue: Tree) = ??? // todo
