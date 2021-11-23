@@ -18,8 +18,12 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
     def maybeS3: Expr[s3.Tree] | Null =
       if t.isS3 then t.asS3 else null
 
-    def asS3: Expr[s3.Tree] =
-      t.asExprOf[s3.Tree]
+    def asS3: Expr[s3.Tree] = t match
+      case t: Term if t.is[Boolean] => '{booleanToConst(${t.asExprOf[Boolean]})}
+      case t: Term if t.is[Int] => '{intToConst(${t.asExprOf[Int]})}
+      case t: Term if t.is[Double] => '{doubleToConst(${t.asExprOf[Double]})}
+      case t => t.asExprOf[s3.Tree]
+
   end extension
 
   object stage3Interpreter extends TreeMap:
