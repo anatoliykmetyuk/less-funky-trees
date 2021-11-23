@@ -6,9 +6,9 @@ import stage3.*
 
 def toBeExpanded = throw RuntimeException("Method wasn't expanded by the compiler")
 
-given Conversion[Double, Const] = Const(_)
-given Conversion[Int, Const] = Const(_)
-given Conversion[Boolean, Const] = Const(_)
+given doubleToConst: Conversion[Double, Const] = Const(_)
+given intToConst: Conversion[Int, Const] = Const(_)
+given booleanToConst: Conversion[Boolean, Const] = Const(_)
 given Conversion[Tree, Boolean] = toBeExpanded
 given treesToBlock: Conversion[Seq[Tree], Block] = ts => Block(ts.toList)
 

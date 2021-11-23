@@ -15,7 +15,7 @@ object Stage12Suite extends TestSuite:
     }
 
     test("blocks should accumulate assignments and if statements") {
-      stage(blocksAccumulation).toString ==> "Block(List(Assignment(Variable(x),Const(10.0)), Assignment(Variable(y),Const(20.0)), Assignment(Variable(x),Const(30.0)), If(BinaryOp(Variable(x),Const(30.0),=),Block(List(Assignment(Variable(x),Const(40.0)))),null)))"
+      stage(blocksAccumulation).toString ==> "Block(List(Assignment(Variable(x),Const(10.0)), Assignment(Variable(y),Const(20.0)), Assignment(Variable(x),Const(30.0)), If(BinaryOp(Variable(x),Const(30.0),=),Block(List(Assignment(Variable(x),Const(40.0)))),null), Const(50.0)))"
     }
 
     test("calls") {
@@ -24,6 +24,10 @@ object Stage12Suite extends TestSuite:
 
     test("loop unrolling") {
       stage(loopUnrolling).toString ==> "Block(List(Assignment(Variable(x),Const(1.0)), Assignment(Variable(x),Const(2.0)), Assignment(Variable(x),Const(3.0)), Assignment(Variable(x),Const(4.0)), Assignment(Variable(x),Const(5.0))))"
+    }
+
+    test("boolean function") {
+      stage(booleanFunction).toString ==> "If(If(BinaryOp(Const(10.0),Const(0.0),=),Block(List(Assignment(Variable(Pitch),Const(10.0)), Const(false))),Block(List(Assignment(Variable(Pitch),Const(20.0)), Const(true)))),Assignment(Variable(Roll),Const(1.0)),Assignment(Variable(Roll),Const(20.0)))"
     }
   }
 end Stage12Suite

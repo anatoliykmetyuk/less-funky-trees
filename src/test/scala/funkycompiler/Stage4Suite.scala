@@ -53,4 +53,14 @@ object Stage4Suite extends TestSuite:
         |  <Setter variable="x" function="5.0" />
         |</Variables>""")
     }
+
+    test("boolean function") {
+      stage4.mkXml(stage3.mkVarDefs(stage(booleanFunction))).toString ==> testStr("""
+        |<Variables>
+        |  <Setter variable="Pitch" function="10.0" activator="(10.0 = 0.0)" />
+        |  <Setter variable="Pitch" function="20.0" activator="(!(10.0 = 0.0))" />
+        |  <Setter variable="Roll" function="1.0" activator="((10.0 = 0.0)?false:true)" />
+        |  <Setter variable="Roll" function="20.0" activator="(!((10.0 = 0.0)?false:true))" />
+        |</Variables>""")
+    }
   }

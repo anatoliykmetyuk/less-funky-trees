@@ -46,3 +46,19 @@ object testPrograms:
     val x = Variable("x")
     for i <- 1 to 5 yield
       x := i
+
+  def f(x: Tree): Tree = stage {
+    if x === 0 then
+      Pitch := 10
+      false
+    else
+      Pitch := 20
+      true
+  }
+
+  transparent inline def booleanFunction =
+    if f(10) then
+      Roll := 1
+    else
+      Roll := 20
+

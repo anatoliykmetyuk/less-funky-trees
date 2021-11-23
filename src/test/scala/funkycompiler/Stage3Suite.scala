@@ -25,4 +25,8 @@ object Stage3Suite extends TestSuite:
     test("loop unrolling") {
       stage3.mkVarDefs(stage(loopUnrolling)).toString ==> "VarDefs(List(VarDef(x,Const(1.0),null), VarDef(x,Const(2.0),null), VarDef(x,Const(3.0),null), VarDef(x,Const(4.0),null), VarDef(x,Const(5.0),null)))"
     }
+
+    test("boolean function") {
+      stage3.mkVarDefs(stage(booleanFunction)).toString ==> "VarDefs(List(VarDef(Pitch,Const(10.0),BinaryOp(Const(10.0),Const(0.0),=)), VarDef(Pitch,Const(20.0),UnaryOp(BinaryOp(Const(10.0),Const(0.0),=),!)), VarDef(Roll,Const(1.0),If(BinaryOp(Const(10.0),Const(0.0),=),Const(false),Const(true))), VarDef(Roll,Const(20.0),UnaryOp(If(BinaryOp(Const(10.0),Const(0.0),=),Const(false),Const(true)),!))))"
+    }
   }
