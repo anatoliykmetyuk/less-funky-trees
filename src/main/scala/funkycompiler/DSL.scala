@@ -1,5 +1,7 @@
 package funkycompiler
 
+import java.io.File
+
 import stage3.*
 
 def toBeExpanded = throw RuntimeException("Method wasn't expanded by the compiler")
@@ -34,3 +36,7 @@ extension (v: Variable) def :=(value: Tree) =
 
 extension (f: Function) def apply(values: Tree*) =
   Call(f.name, values.toList)
+
+inline def program(plane: File)(inline expr: Any): Unit =
+  val xml = stage4.mkXml(stage3.mkVarDefs(stage(expr)))
+  writeVariables(plane, xml)

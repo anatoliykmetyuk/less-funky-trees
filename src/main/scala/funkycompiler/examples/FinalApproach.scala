@@ -5,9 +5,9 @@ import stage4.mkXml
 import stdlib.*
 
 
-@main def main =
+@main def FinalApproach =
   val testPlane = java.io.File("/Users/kmetiuk/Library/Application Support/unity.Jundroo.SimplePlanes/AircraftDesigns/Test Plane.xml")
-  val program = mkXml(mkVarDefs(stage {
+  program(testPlane) {
     val elevators = Variable("elevators")
     val ailerons = Variable("ailerons")
     val rudder = Variable("rudder")
@@ -37,5 +37,4 @@ import stdlib.*
       if rate(AltitudeAgl) > targetRateOfDescent then 0.08
       else if rate(AltitudeAgl) < maxAllowedRateOfDescent then 0.25
       else 0.12)
-  }))
-  writeVariables(testPlane, program)
+  }
