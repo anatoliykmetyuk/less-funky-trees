@@ -49,9 +49,4 @@ import stdlib.*
 
   elevators := smooth(PID(0,PitchAngle+smooth(AngleOfAttack, 0.1),0.1,0,0.1), 0.1) + Pitch
   headingSet(-60)
-
-  // if abs(deltaangle(RollAngle, targetAngle)) > maxDeviation then
-  //   ailerons := sign(RollAngle - targetAngle) * 0.3
-  // else
-  //   ailerons := smooth(PID(0, RollRate, 0.001, 0, 0), 0.1) + Roll
 }
