@@ -42,14 +42,12 @@ def stageImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
           case s => s
         }
         val tRes = treeTermsToBlockTerm(transformTerm(res)(owner)) match
-          case t: Term if t.is[Boolean] => '{booleanToConst(${t.asExprOf[Boolean]})}.asTerm
-          case t: Term if t.is[Int] => '{intToConst(${t.asExprOf[Int]})}.asTerm
-          case t: Term if t.is[Double] => '{doubleToConst(${t.asExprOf[Double]})}.asTerm
+          case t: Term if t.is[Boolean] | t.is[Int] | t.is[Double] => t.asS3.asTerm
           case t => t
 
         if tStats.exists(_.isS3) then
           val tStatsRecorded = Expr.ofList((tStats :+ tRes).collect {
-            case s if s.isS3 => s.asS3 })
+            case s: Term if s.isS3 => s.asS3 })
           Block.copy(t)(tStats :+ tRes, '{s3.Block($tStatsRecorded)}.asTerm)
         else Block.copy(t)(tStats, tRes)
 
