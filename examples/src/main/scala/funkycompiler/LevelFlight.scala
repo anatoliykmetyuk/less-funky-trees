@@ -6,6 +6,7 @@ import stdlib.*
 
 
 @main def LevelFlight = program(testPlane) {
-  elevators := smooth(PID(0,PitchAngle+smooth(AngleOfAttack, 0.1),0.1,0,0.1), 0.1) + Pitch
-  thrust := 1
+  while true do
+    elevators := smooth(PID(0,PitchAngle+smooth(AngleOfAttack, 0.1),0.1,0,0.1), 0.1) + Pitch
+    thrust := 1
 }
