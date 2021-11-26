@@ -1,7 +1,8 @@
 package funkycompiler
 
-import utest._
-import testPrograms.*
+import utest.*
+import stage3.{ Variable, Tree }
+import stdlib.*
 
 
 object FunkySuite extends TestSuite:

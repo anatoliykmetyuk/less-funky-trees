@@ -66,4 +66,4 @@ def funkyImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
   val out = stage3Interpreter.transformTerm(expr.asTerm)(Symbol.spliceOwner).asExprOf[s3.Tree]
   // println(s"Output:\n${out.show}")
   out
-end stageImpl
+end funkyImpl

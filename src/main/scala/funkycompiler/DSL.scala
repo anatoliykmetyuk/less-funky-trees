@@ -45,12 +45,15 @@ extension (ts: Seq[Tree]) def sumTrees =
   ts.foldLeft(0: Tree) { case (accum, t) => accum + t }
 
 inline def program(plane: File)(inline expr: Any): Unit =
-  val xml = stage4.mkXml(stage3.mkVarDefs(stage(expr)))
+  val xml = funky(expr).compile
   writeVariables(plane, xml)
 
 private var freshVarCounter = 0
-def freshVar(prefix: String = "syntheticVar") =
+def freshVarName(prefix: String = "syntheticVar") =
   freshVarCounter += 1
-  Variable(s"${prefix}${freshVarCounter}")
+  s"${prefix}${freshVarCounter}"
+
+def freshVar(prefix: String = "syntheticVar") =
+  Variable(freshVarName(prefix))
 
 def defineVariable(initialValue: Tree) = ??? // todo
