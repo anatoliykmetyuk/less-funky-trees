@@ -38,7 +38,7 @@ object stage4:
 
   extension (e: Expr)
     def unary_! = UnaryOp(e, "!")
-    def & (e2: Expr) = BinaryOp(e, e2, "&")
+    def & (e2: Expr) = BinaryOp(e, e2, "&amp;")
     def | (e2: Expr) = BinaryOp(e, e2, "|")
 
   extension (vd: VarDef) def simplify: VarDef = vd match
@@ -51,10 +51,10 @@ object stage4:
     def simplificationPass(e: Expr) = e match
       case _: (Const | VarRef) => e
 
-      case BinaryOp(Const(true), x, "&") => x
-      case BinaryOp(x, Const(true), "&") => x
-      case BinaryOp(Const(false), _, "&") => Const(false)
-      case BinaryOp(_, Const(false), "&") => Const(false)
+      case BinaryOp(Const(true), x, "&amp;") => x
+      case BinaryOp(x, Const(true), "&amp;") => x
+      case BinaryOp(Const(false), _, "&amp;") => Const(false)
+      case BinaryOp(_, Const(false), "&amp;") => Const(false)
       case BinaryOp(Const(false), x, "|") => x
       case BinaryOp(x, Const(false), "|") => x
       case BinaryOp(Const(true), _, "|") => Const(true)
