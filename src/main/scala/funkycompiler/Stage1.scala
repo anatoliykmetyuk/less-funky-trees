@@ -4,8 +4,8 @@ import scala.quoted.*
 import funkycompiler.{ stage3 => s3 }
 
 
-inline def stage(inline expr: Any): s3.Tree = ${stageImpl('expr)}
-def stageImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
+inline def funky(inline expr: Any): s3.Tree = ${funkyImpl('expr)}
+def funkyImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
   import quotes.reflect.*
 
   extension (t: Tree)

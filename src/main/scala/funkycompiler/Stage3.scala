@@ -74,6 +74,9 @@ object stage3:
       case Block(ts) => ts.flatMap(_.allowReevaluation)
       case Parallel(ts) => ts.flatMap(_.allowReevaluation)
       case While(cnd, ts) => cnd.allowReevaluation ++ ts.flatMap(_.allowReevaluation)
+
+    def varDefs = s4.VarDefs(t.defs)
+    def compile = t.varDefs.mkXml
   end extension
 
   extension (vd: s4.VarDef)
@@ -99,5 +102,3 @@ object stage3:
     def afterAll(ts: List[Tree]): List[s4.VarDef] = vds.map(_.afterAll(ts))
   extension (ts: List[Tree])
     def allEvaluated: s4.Expr = ts.foldLeft(s4.Const(true)) { (accum, t) => accum & t }
-
-  def mkVarDefs(t: Tree) = s4.VarDefs(t.defs)
