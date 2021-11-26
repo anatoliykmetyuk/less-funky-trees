@@ -7,18 +7,23 @@ object stage3:
   case class Function(name: String)
 
   sealed trait Tree
+  sealed trait MemoizedCondition(prefix: String) extends Tree:
+    val condition: Tree
+    val memoisedCondition = s4.VarRef(freshVarName(s"${prefix}_condition_"))
+    def updateMemoisedCondition = Assignment(Variable(memoisedCondition.name), condition)
+
   case class Const(value: Double | Boolean) extends Tree
   case class Variable(name: String) extends Tree
   case class Call(function: String, args: List[Tree]) extends Tree
   case class BinaryOp(lhs: Tree, rhs: Tree, sign: String) extends Tree
   case class UnaryOp(rhs: Tree, sign: String) extends Tree
-  case class If(condition: Tree, lhs: Tree, rhs: Tree | Null) extends Tree
+  case class If(condition: Tree, lhs: Tree, rhs: Tree | Null) extends MemoizedCondition("if")
   case class Block(stats: List[Tree]) extends Tree
-  case class While(condition: Tree, body: Tree) extends Tree
+  case class While(condition: Tree, body: Tree) extends MemoizedCondition("while")
   case class Parallel(stats: List[Tree]) extends Tree
 
   case class Assignment(lhs: Variable, rhs: Tree) extends Tree:
-    val evaluationFlag = s4.VarRef(freshVarName(s"${lhs.name}_evaluationFlag"))
+    val evaluationFlag = s4.VarRef(freshVarName(s"evaluationFlag_${lhs.name}_"))
 
   extension (t: Tree)
     /**
@@ -39,18 +44,22 @@ object stage3:
         rhs.defs ++ List(
           s4.VarDef(name, rhs.result, !t.evaluationFlag),
           s4.VarDef(t.evaluationFlag.name, s4.Const(true), s4.Const(true))).after(rhs)
-      case If(cnd, lhs, rhs) =>
-        cnd.defs ++
-          lhs.defs.ifTrue(cnd) ++
-          lhs.disableEvaluation.ifTrue(!cnd) ++ (if rhs != null then
-            rhs.defs.ifTrue(!cnd) ++
-            rhs.disableEvaluation.ifTrue(cnd)
-          else Nil)
+      case t@If(cnd, lhs, rhs) =>
+        val lhsDefs = lhs.defs
+        val rhsDefs = if rhs != null then rhs.defs else Nil
+        t.updateMemoisedCondition.defs ++
+          lhsDefs.whileTrue(t.memoisedCondition) ++
+          lhsDefs.disableEvaluation.whileTrue(!t.memoisedCondition) ++
+          rhsDefs.whileTrue(!t.memoisedCondition) ++
+          rhsDefs.disableEvaluation.whileTrue(t.memoisedCondition)
       case Block(ts) => defsOneAfterAnother(ts)
       case Parallel(ts) => ts.flatMap(_.defs)
-      case While(cnd, body) =>
-        cnd.defs ++ body.defs.ifTrue(cnd) ++
-          t.allowReevaluation.after(body).ifTrue(cnd)
+      case t@While(cnd, body) =>
+        val loopedDefs =
+          t.updateMemoisedCondition.defs ++
+            body.defs.whileTrue(t.memoisedCondition) ++
+            t.updateMemoisedCondition.defs.after(body)
+        loopedDefs ++ loopedDefs.allowReevaluation.after(body).whileTrue(t.memoisedCondition)
 
     /**
      * Defines what it means for a tree to be fully evaluated.
@@ -64,32 +73,10 @@ object stage3:
       case BinaryOp(lhs, rhs, _) => lhs.evaluated & rhs.evaluated
       case t@Assignment(_, rhs) => rhs.evaluated
       case If(cnd, lhs, rhs) => lhs.evaluated |
-        (if rhs != null then rhs.evaluated else s4.Const(true))
+        (if rhs != null then rhs.evaluated else s4.Const(false))
       case Block(ts) => ts.allEvaluated
       case Parallel(ts) => ts.allEvaluated
-      case While(cnd, ts) => cnd.evaluated & !cnd.result & ts.evaluated
-
-    /** Guarantees that the given tree's vardefs aren't going to be evaluated. */
-    def disableEvaluation: List[s4.VarDef] = setEvaluationFlag(true)
-
-    /**
-     * Reset all the variable evaluation flags, thus allowing them
-     * to be computed one more time.
-     */
-    def allowReevaluation: List[s4.VarDef] = setEvaluationFlag(false)
-
-    def setEvaluationFlag(value: Boolean): List[s4.VarDef] = t match
-      case _: (Const | Variable) => Nil
-      case Call(_, ts) => ts.flatMap(_.setEvaluationFlag(value))
-      case BinaryOp(lhs, rhs, _) => lhs.setEvaluationFlag(value) ++ rhs.setEvaluationFlag(value)
-      case UnaryOp(rhs, _) => rhs.setEvaluationFlag(value)
-      case t@Assignment(_, rhs) => rhs.setEvaluationFlag(value) :+
-        s4.VarDef(t.evaluationFlag.name, s4.Const(value), s4.Const(true))
-      case If(cnd, lhs, rhs) => cnd.setEvaluationFlag(value) ++ lhs.setEvaluationFlag(value) ++
-        (if rhs != null then rhs.setEvaluationFlag(value) else Nil)
-      case Block(ts) => ts.flatMap(_.setEvaluationFlag(value))
-      case Parallel(ts) => ts.flatMap(_.setEvaluationFlag(value))
-      case While(cnd, ts) => cnd.setEvaluationFlag(value) ++ ts.setEvaluationFlag(value)
+      case t@While(cnd, ts) => cnd.evaluated & !t.memoisedCondition & ts.evaluated
 
     def result: s4.Expr = t match
       case Const(x) => s4.Const(x)
@@ -112,12 +99,8 @@ object stage3:
     def after(t: Tree): s4.VarDef = vd.copy(condition = vd.condition & t.evaluated)
 
     /** Evaluate `vd` only when `cnd`'s result is `true`. */
-    def ifTrue(cnd: Tree): s4.VarDef =
-      vd.copy(condition = vd.condition & cnd.result).after(cnd)
-
-    /** Evaluate `vd` only after all of the `ts` are evaluated. */
-    def afterAll(ts: List[Tree]): s4.VarDef =
-      ts.foldLeft(vd) { case (vdTransformed, t) => vdTransformed.after(t) }
+    def whileTrue(cnd: s4.Expr): s4.VarDef =
+      vd.copy(condition = vd.condition & cnd)
   end extension
 
   def defsOneAfterAnother(ts: List[Tree]) =
@@ -129,8 +112,21 @@ object stage3:
 
   extension (vds: List[s4.VarDef])
     def after(t: Tree): List[s4.VarDef] = vds.map(_.after(t))
-    def ifTrue(cnd: Tree): List[s4.VarDef] = vds.map(_.ifTrue(cnd))
-    def afterAll(ts: List[Tree]): List[s4.VarDef] = vds.map(_.afterAll(ts))
+    def whileTrue(cnd: s4.Expr): List[s4.VarDef] = vds.map(_.whileTrue(cnd))
+
+    /** Guarantees that the given tree's vardefs aren't going to be evaluated. */
+    def disableEvaluation: List[s4.VarDef] = setEvaluationFlag(true)
+
+    /**
+     * Reset all the variable evaluation flags, thus allowing them
+     * to be computed one more time.
+     */
+    def allowReevaluation: List[s4.VarDef] = setEvaluationFlag(false)
+
+    def setEvaluationFlag(value: Boolean): List[s4.VarDef] =
+      vds.collect { case s4.VarDef(name, _, _) if name.startsWith("evaluationFlag_") =>
+        s4.VarDef(name, s4.Const(value), s4.Const(true)) }
+
   extension (ts: List[Tree])
     def allEvaluated: s4.Expr = ts.foldLeft(s4.Const(true): s4.Expr) {
       (accum, t) => accum & t.evaluated }

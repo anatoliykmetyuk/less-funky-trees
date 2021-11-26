@@ -53,10 +53,12 @@ object stage4:
 
       case BinaryOp(Const(true), x, "&") => x
       case BinaryOp(x, Const(true), "&") => x
-      case BinaryOp(Const(x: Boolean), Const(y: Boolean), "&") => Const(x && y)
+      case BinaryOp(Const(false), _, "&") => Const(false)
+      case BinaryOp(_, Const(false), "&") => Const(false)
       case BinaryOp(Const(false), x, "|") => x
       case BinaryOp(x, Const(false), "|") => x
-      case BinaryOp(Const(x: Boolean), Const(y: Boolean), "|") => Const(x || y)
+      case BinaryOp(Const(true), _, "|") => Const(true)
+      case BinaryOp(_, Const(true), "|") => Const(true)
 
       case BinaryOp(lhs, rhs, sign) => BinaryOp(lhs.simplify, rhs.simplify, sign)
       case UnaryOp(rhs, sign) => UnaryOp(rhs.simplify, sign)
