@@ -20,8 +20,8 @@ extension (n: Tree)
 
   def <(t: Tree) = BinaryOp(n, t, "&lt;")
   def >(t: Tree) = BinaryOp(n, t, "&gt;")
-  def <=(t: Tree) = BinaryOp(n, t, "&lt;")
-  def >=(t: Tree) = BinaryOp(n, t, "&gt;")
+  def <=(t: Tree) = BinaryOp(n, t, "&lt;=")
+  def >=(t: Tree) = BinaryOp(n, t, "&gt;=")
   def !==(t: Tree) = BinaryOp(n, t, "!=")
   def ===(t: Tree) = BinaryOp(n, t, "=")
 
