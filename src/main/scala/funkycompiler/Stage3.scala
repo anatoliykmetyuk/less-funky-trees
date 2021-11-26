@@ -14,7 +14,7 @@ object stage3:
   case class UnaryOp(rhs: Tree, sign: String) extends Tree
   case class If(condition: Tree, lhs: Tree, rhs: Tree | Null) extends Tree
   case class Block(stats: List[Tree]) extends Tree
-  case class While(condition: Tree, stats: List[Tree]) extends Tree
+  case class While(condition: Tree, body: Tree) extends Tree
   case class Parallel(stats: List[Tree]) extends Tree
 
   case class Assignment(lhs: Variable, rhs: Tree) extends Tree:
@@ -40,13 +40,17 @@ object stage3:
           s4.VarDef(name, rhs.result, !t.evaluationFlag),
           s4.VarDef(t.evaluationFlag.name, s4.Const(true), s4.Const(true))).after(rhs)
       case If(cnd, lhs, rhs) =>
-        cnd.defs ++ lhs.defs.ifTrue(cnd) ++
-          (if rhs != null then rhs.defs.ifTrue(!cnd) else Nil)
+        cnd.defs ++
+          lhs.defs.ifTrue(cnd) ++
+          lhs.disableEvaluation.ifTrue(!cnd) ++ (if rhs != null then
+            rhs.defs.ifTrue(!cnd) ++
+            rhs.disableEvaluation.ifTrue(cnd)
+          else Nil)
       case Block(ts) => defsOneAfterAnother(ts)
       case Parallel(ts) => ts.flatMap(_.defs)
-      case While(cnd, ts) =>
-        cnd.defs ++ defsOneAfterAnother(ts).ifTrue(cnd) ++
-          t.allowReevaluation.after(ts.last).ifTrue(cnd)
+      case While(cnd, body) =>
+        cnd.defs ++ body.defs.ifTrue(cnd) ++
+          t.allowReevaluation.after(body).ifTrue(cnd)
 
     /**
      * Defines what it means for a tree to be fully evaluated.
@@ -58,29 +62,34 @@ object stage3:
       case Call(_, ts) => ts.allEvaluated
       case UnaryOp(rhs, _) => rhs.evaluated
       case BinaryOp(lhs, rhs, _) => lhs.evaluated & rhs.evaluated
-      case t@Assignment(_, rhs) => rhs.evaluated & t.evaluationFlag
+      case t@Assignment(_, rhs) => rhs.evaluated
       case If(cnd, lhs, rhs) => lhs.evaluated |
         (if rhs != null then rhs.evaluated else s4.Const(true))
-      case Block(ts) => ts.last.evaluated
+      case Block(ts) => ts.allEvaluated
       case Parallel(ts) => ts.allEvaluated
-      case While(cnd, ts) => cnd.evaluated & !cnd.result & ts.last.evaluated
+      case While(cnd, ts) => cnd.evaluated & !cnd.result & ts.evaluated
+
+    /** Guarantees that the given tree's vardefs aren't going to be evaluated. */
+    def disableEvaluation: List[s4.VarDef] = setEvaluationFlag(true)
 
     /**
      * Reset all the variable evaluation flags, thus allowing them
      * to be computed one more time.
      */
-    def allowReevaluation: List[s4.VarDef] = t match
+    def allowReevaluation: List[s4.VarDef] = setEvaluationFlag(false)
+
+    def setEvaluationFlag(value: Boolean): List[s4.VarDef] = t match
       case _: (Const | Variable) => Nil
-      case Call(_, ts) => ts.flatMap(_.allowReevaluation)
-      case BinaryOp(lhs, rhs, _) => lhs.allowReevaluation ++ rhs.allowReevaluation
-      case UnaryOp(rhs, _) => rhs.allowReevaluation
-      case t@Assignment(_, rhs) => rhs.allowReevaluation :+
-        s4.VarDef(t.evaluationFlag.name, s4.Const(false), s4.Const(true))
-      case If(cnd, lhs, rhs) => cnd.allowReevaluation ++ lhs.allowReevaluation ++
-        (if rhs != null then rhs.allowReevaluation else Nil)
-      case Block(ts) => ts.flatMap(_.allowReevaluation)
-      case Parallel(ts) => ts.flatMap(_.allowReevaluation)
-      case While(cnd, ts) => cnd.allowReevaluation ++ ts.flatMap(_.allowReevaluation)
+      case Call(_, ts) => ts.flatMap(_.setEvaluationFlag(value))
+      case BinaryOp(lhs, rhs, _) => lhs.setEvaluationFlag(value) ++ rhs.setEvaluationFlag(value)
+      case UnaryOp(rhs, _) => rhs.setEvaluationFlag(value)
+      case t@Assignment(_, rhs) => rhs.setEvaluationFlag(value) :+
+        s4.VarDef(t.evaluationFlag.name, s4.Const(value), s4.Const(true))
+      case If(cnd, lhs, rhs) => cnd.setEvaluationFlag(value) ++ lhs.setEvaluationFlag(value) ++
+        (if rhs != null then rhs.setEvaluationFlag(value) else Nil)
+      case Block(ts) => ts.flatMap(_.setEvaluationFlag(value))
+      case Parallel(ts) => ts.flatMap(_.setEvaluationFlag(value))
+      case While(cnd, ts) => cnd.setEvaluationFlag(value) ++ ts.setEvaluationFlag(value)
 
     def result: s4.Expr = t match
       case Const(x) => s4.Const(x)
@@ -93,9 +102,9 @@ object stage3:
         if rhs != null then rhs.result else null)
       case Block(ts) => ts.last.result
       case Parallel(ts) => ts.last.result
-      case While(cnd, ts) => ts.last.result
+      case While(cnd, ts) => ts.result
 
-    def compile = s4.VarDefs(t.defs).toXml
+    def compile = s4.VarDefs(t.defs).simplify.toXml
   end extension
 
   extension (vd: s4.VarDef)

@@ -13,7 +13,7 @@ def funkyImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
       case t: Term => t.tpe <:< TypeRepr.of[T]
       case _ => false
 
-    def isS3: Boolean = t.is[s3.Tree]
+    def isS3: Boolean = t.is[s3.Tree] || t.is[Boolean] || t.is[Int] || t.is[Double]
 
     def maybeS3: Expr[s3.Tree] | Null =
       if t.isS3 then t.asS3 else null
@@ -59,6 +59,12 @@ def funkyImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
             case Literal(UnitConstant()) => '{null}
             case x => x.asS3
           '{s3.If($tPExpr, $tPos, $tNeg)}.asTerm
+
+      case While(p, body) => transformTerm(p)(owner).maybeS3 match
+        case null => super.transformTerm(t)(owner)
+        case tPExpr: Expr[s3.Tree] =>
+          val bodyT = transformTerm(body)(owner).asS3
+          '{s3.While($tPExpr, $bodyT)}.asTerm
 
       case _ => super.transformTerm(t)(owner)
   end stage3Interpreter

@@ -40,3 +40,31 @@ object stage4:
     def unary_! = UnaryOp(e, "!")
     def & (e2: Expr) = BinaryOp(e, e2, "&")
     def | (e2: Expr) = BinaryOp(e, e2, "|")
+
+  extension (vd: VarDef) def simplify: VarDef = vd match
+    case VarDef(name, expr, condition) => VarDef(name, expr.simplify, condition.simplify)
+
+  extension (vds: VarDefs) def simplify: VarDefs =
+    vds.copy(defs = vds.defs.map(_.simplify))
+
+  extension (expr: Expr) def simplify: Expr =
+    def simplificationPass(e: Expr) = e match
+      case _: (Const | VarRef) => e
+
+      case BinaryOp(Const(true), x, "&") => x
+      case BinaryOp(x, Const(true), "&") => x
+      case BinaryOp(Const(x: Boolean), Const(y: Boolean), "&") => Const(x && y)
+      case BinaryOp(Const(false), x, "|") => x
+      case BinaryOp(x, Const(false), "|") => x
+      case BinaryOp(Const(x: Boolean), Const(y: Boolean), "|") => Const(x || y)
+
+      case BinaryOp(lhs, rhs, sign) => BinaryOp(lhs.simplify, rhs.simplify, sign)
+      case UnaryOp(rhs, sign) => UnaryOp(rhs.simplify, sign)
+      case If(condition, lhs, rhs) => If(condition.simplify, lhs.simplify, rhs.simplify)
+      case Call(name, args) => Call(name, args.map(_.simplify))
+    end simplificationPass
+    @annotation.tailrec def loop(e: Expr): Expr =
+      val simplified = simplificationPass(e)
+      if simplified != e then loop(simplified) else e
+    end loop
+    loop(expr)
