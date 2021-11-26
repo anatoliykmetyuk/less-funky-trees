@@ -8,6 +8,9 @@ import stdlib.*
 object FunkySuite extends TestSuite:
   def testStr(str: String) = str.stripMargin.drop(1)
 
+  override def utestBeforeEach(path: Seq[String]): Unit =
+    resetFreshVarCounter()
+
   val tests = Tests {
     test("if statement") {
       funky {
@@ -16,12 +19,14 @@ object FunkySuite extends TestSuite:
         if b > 10 then a := 20 else a := 10
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="a" function="20.0" activator="((!a_evaluationFlag1) & (b &gt; 10.0))/>
-        |  <Setter variable="a_evaluationFlag1" function="true" activator="(b &gt; 10.0)/>
-        |  <Setter variable="a_evaluationFlag1" function="true" activator="(!(b &gt; 10.0))/>
-        |  <Setter variable="a" function="10.0" activator="((!a_evaluationFlag2) & (!(b &gt; 10.0)))/>
-        |  <Setter variable="a_evaluationFlag2" function="true" activator="(!(b &gt; 10.0))/>
-        |  <Setter variable="a_evaluationFlag2" function="true" activator="(b &gt; 10.0)/>
+        |  <Setter variable="if_condition_3" function="(b &gt; 10.0)" activator="(!evaluationFlag_if_condition_3_4)/>
+        |  <Setter variable="evaluationFlag_if_condition_3_4" function="true" />
+        |  <Setter variable="a" function="20.0" activator="((!evaluationFlag_a_1) & if_condition_3)/>
+        |  <Setter variable="evaluationFlag_a_1" function="true" activator="if_condition_3/>
+        |  <Setter variable="evaluationFlag_a_1" function="true" activator="(!if_condition_3)/>
+        |  <Setter variable="a" function="10.0" activator="((!evaluationFlag_a_2) & (!if_condition_3))/>
+        |  <Setter variable="evaluationFlag_a_2" function="true" activator="(!if_condition_3)/>
+        |  <Setter variable="evaluationFlag_a_2" function="true" activator="if_condition_3/>
         |</Variables>""")
     }
 

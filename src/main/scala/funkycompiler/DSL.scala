@@ -49,6 +49,7 @@ inline def program(plane: File)(inline expr: Any): Unit =
   writeVariables(plane, xml)
 
 private var freshVarCounter = 0
+def resetFreshVarCounter() = freshVarCounter = 0
 def freshVarName(prefix: String = "syntheticVar") =
   freshVarCounter += 1
   s"${prefix}${freshVarCounter}"
