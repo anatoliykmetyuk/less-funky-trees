@@ -95,7 +95,7 @@ object stage3:
       case Parallel(ts) => ts.last.result
       case While(cnd, ts) => ts.last.result
 
-    def compile = s4.VarDefs(t.defs).simplify.toXml
+    def compile = s4.VarDefs(t.defs).toXml
   end extension
 
   extension (vd: s4.VarDef)

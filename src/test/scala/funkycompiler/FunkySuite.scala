@@ -16,8 +16,10 @@ object FunkySuite extends TestSuite:
         if b > 10 then a := 20 else a := 10
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="a" function="20.0" activator="(b &gt; 10.0)" />
-        |  <Setter variable="a" function="10.0" activator="(!(b &gt; 10.0))" />
+        |  <Setter variable="a" function="20.0" activator="((((!a_evaluationFlag1) & true) & (b &gt; 10.0)) & (true & true))/>
+        |  <Setter variable="a_evaluationFlag1" function="true" activator="(((true & true) & (b &gt; 10.0)) & (true & true))/>
+        |  <Setter variable="a" function="10.0" activator="((((!a_evaluationFlag2) & true) & (!(b &gt; 10.0))) & (true & true))/>
+        |  <Setter variable="a_evaluationFlag2" function="true" activator="(((true & true) & (!(b &gt; 10.0))) & (true & true))/>
         |</Variables>""")
     }
 
@@ -41,10 +43,14 @@ object FunkySuite extends TestSuite:
         else Flaps := Flaps
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="Flaps" function="(Flaps + 0.02)" activator="((PitchRate &gt; 0.01) &amp; (Flaps &lt; 30.0))" />
-        |  <Setter variable="Autotrim" function="(Autotrim + 0.02)" activator="((PitchRate &gt; 0.01) &amp; (!(Flaps &lt; 30.0)))" />
-        |  <Setter variable="Flaps" function="(Flaps - 0.02)" activator="((!(PitchRate &gt; 0.01)) &amp; (PitchRate &lt; -0.01))" />
-        |  <Setter variable="Flaps" function="Flaps" activator="((!(PitchRate &gt; 0.01)) &amp; (!(PitchRate &lt; -0.01)))" />
+        |  <Setter variable="Flaps" function="(Flaps + 0.02)" activator="((((((!Flaps_evaluationFlag3) & (true & true)) & (Flaps &lt; 30.0)) & (true & true)) & (PitchRate &gt; 0.01)) & (true & true))/>
+        |  <Setter variable="Flaps_evaluationFlag3" function="true" activator="(((((true & (true & true)) & (Flaps &lt; 30.0)) & (true & true)) & (PitchRate &gt; 0.01)) & (true & true))/>
+        |  <Setter variable="Autotrim" function="(Autotrim + 0.02)" activator="((((((!Autotrim_evaluationFlag4) & (true & true)) & (!(Flaps &lt; 30.0))) & (true & true)) & (PitchRate &gt; 0.01)) & (true & true))/>
+        |  <Setter variable="Autotrim_evaluationFlag4" function="true" activator="(((((true & (true & true)) & (!(Flaps &lt; 30.0))) & (true & true)) & (PitchRate &gt; 0.01)) & (true & true))/>
+        |  <Setter variable="Flaps" function="(Flaps - 0.02)" activator="((((((!Flaps_evaluationFlag5) & (true & true)) & (PitchRate &lt; -0.01)) & (true & true)) & (!(PitchRate &gt; 0.01))) & (true & true))/>
+        |  <Setter variable="Flaps_evaluationFlag5" function="true" activator="(((((true & (true & true)) & (PitchRate &lt; -0.01)) & (true & true)) & (!(PitchRate &gt; 0.01))) & (true & true))/>
+        |  <Setter variable="Flaps" function="Flaps" activator="((((((!Flaps_evaluationFlag6) & true) & (!(PitchRate &lt; -0.01))) & (true & true)) & (!(PitchRate &gt; 0.01))) & (true & true))/>
+        |  <Setter variable="Flaps_evaluationFlag6" function="true" activator="(((((true & true) & (!(PitchRate &lt; -0.01))) & (true & true)) & (!(PitchRate &gt; 0.01))) & (true & true))/>
         |</Variables>""")
     }
 
@@ -60,10 +66,14 @@ object FunkySuite extends TestSuite:
         50
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="x" function="10.0" />
-        |  <Setter variable="y" function="20.0" />
-        |  <Setter variable="x" function="30.0" />
-        |  <Setter variable="x" function="40.0" activator="(x = 30.0)" />
+        |  <Setter variable="x" function="10.0" activator="((!x_evaluationFlag12) & true)/>
+        |  <Setter variable="x_evaluationFlag12" function="true" activator="(true & true)/>
+        |  <Setter variable="y" function="20.0" activator="(((!y_evaluationFlag13) & true) & true)/>
+        |  <Setter variable="y_evaluationFlag13" function="true" activator="((true & true) & true)/>
+        |  <Setter variable="x" function="30.0" activator="(((!x_evaluationFlag14) & true) & true)/>
+        |  <Setter variable="x_evaluationFlag14" function="true" activator="((true & true) & true)/>
+        |  <Setter variable="x" function="40.0" activator="(((((!x_evaluationFlag16) & true) & (x = 30.0)) & (true & true)) & true)/>
+        |  <Setter variable="x_evaluationFlag16" function="true" activator="((((true & true) & (x = 30.0)) & (true & true)) & true)/>
         |</Variables>""")
     }
 
@@ -73,7 +83,8 @@ object FunkySuite extends TestSuite:
         x := abs(25)
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="x" function="abs(25.0)" />
+        |  <Setter variable="x" function="abs(25.0)" activator="((!x_evaluationFlag17) & (true & true))/>
+        |  <Setter variable="x_evaluationFlag17" function="true" activator="(true & (true & true))/>
         |</Variables>""")
     }
 
@@ -84,11 +95,16 @@ object FunkySuite extends TestSuite:
           x := i
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="x" function="1.0" />
-        |  <Setter variable="x" function="2.0" />
-        |  <Setter variable="x" function="3.0" />
-        |  <Setter variable="x" function="4.0" />
-        |  <Setter variable="x" function="5.0" />
+        |  <Setter variable="x" function="1.0" activator="((!x_evaluationFlag18) & true)/>
+        |  <Setter variable="x_evaluationFlag18" function="true" activator="(true & true)/>
+        |  <Setter variable="x" function="2.0" activator="(((!x_evaluationFlag19) & true) & true)/>
+        |  <Setter variable="x_evaluationFlag19" function="true" activator="((true & true) & true)/>
+        |  <Setter variable="x" function="3.0" activator="(((!x_evaluationFlag20) & true) & true)/>
+        |  <Setter variable="x_evaluationFlag20" function="true" activator="((true & true) & true)/>
+        |  <Setter variable="x" function="4.0" activator="(((!x_evaluationFlag21) & true) & true)/>
+        |  <Setter variable="x_evaluationFlag21" function="true" activator="((true & true) & true)/>
+        |  <Setter variable="x" function="5.0" activator="(((!x_evaluationFlag22) & true) & true)/>
+        |  <Setter variable="x_evaluationFlag22" function="true" activator="((true & true) & true)/>
         |</Variables>""")
     }
 
@@ -109,10 +125,14 @@ object FunkySuite extends TestSuite:
           Roll := 20
       }.compile ==> testStr("""
         |<Variables>
-        |  <Setter variable="Pitch" function="10.0" activator="(10.0 = 0.0)" />
-        |  <Setter variable="Pitch" function="20.0" activator="(!(10.0 = 0.0))" />
-        |  <Setter variable="Roll" function="1.0" activator="((10.0 = 0.0)?false:true)" />
-        |  <Setter variable="Roll" function="20.0" activator="(!((10.0 = 0.0)?false:true))" />
+        |  <Setter variable="Pitch" function="10.0" activator="((((!Pitch_evaluationFlag24) & true) & (10.0 = 0.0)) & (true & true))/>
+        |  <Setter variable="Pitch_evaluationFlag24" function="true" activator="(((true & true) & (10.0 = 0.0)) & (true & true))/>
+        |  <Setter variable="Pitch" function="20.0" activator="((((!Pitch_evaluationFlag26) & true) & (!(10.0 = 0.0))) & (true & true))/>
+        |  <Setter variable="Pitch_evaluationFlag26" function="true" activator="(((true & true) & (!(10.0 = 0.0))) & (true & true))/>
+        |  <Setter variable="Roll" function="1.0" activator="((((!Roll_evaluationFlag27) & true) & ((10.0 = 0.0)?false:true)) & (true | true))/>
+        |  <Setter variable="Roll_evaluationFlag27" function="true" activator="(((true & true) & ((10.0 = 0.0)?false:true)) & (true | true))/>
+        |  <Setter variable="Roll" function="20.0" activator="((((!Roll_evaluationFlag28) & true) & (!((10.0 = 0.0)?false:true))) & (true | true))/>
+        |  <Setter variable="Roll_evaluationFlag28" function="true" activator="(((true & true) & (!((10.0 = 0.0)?false:true))) & (true | true))/>
         |</Variables>""")
     }
   }
