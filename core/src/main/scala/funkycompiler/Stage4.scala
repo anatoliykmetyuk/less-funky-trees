@@ -20,7 +20,7 @@ object stage4:
     case VarDef(name, expr, condition) =>
       val maybeActivator = condition match
         case Const(true) => ""
-        case cnd => s"""activator="${cnd.toXml}"""
+        case cnd => s"""activator="${cnd.toXml}""""
       s"""  <Setter variable="$name" function="${expr.toXml}" $maybeActivator/>"""
 
     case Const(x) => x.toString

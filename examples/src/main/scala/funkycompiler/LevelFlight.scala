@@ -1,8 +1,7 @@
 package funkycompiler
 package examples
 
-import stage3.{ Tree, Variable, mkVarDefs }
-import stage4.mkXml
+import stage3.{ Tree, Variable }
 import stdlib.*
 
 
