@@ -1,8 +1,8 @@
 package funkycompiler
 package examples
 
-import stdlib.*
 import stage3.*
+import stdlib.*
 
 val testPlane = java.io.File("/Users/kmetiuk/Library/Application Support/unity.Jundroo.SimplePlanes/AircraftDesigns/Test Plane.xml")
 
@@ -13,10 +13,48 @@ val thrust = Variable("thrust")
 
 val rateOfDescent = rate(AltitudeAgl)
 
-/*
-DebugExpression sum(Pitch/250) – (1) proportional, how much
-DebugExpression sum(Yaw/250) – (2) derivative, how careful
-DebugExpression sum(Roll/250) – (3) integral, how quickly
-*/
-def PIDTune(target: Double, current: Tree, initP: Double = 0, initI: Double = 0, initD: Double = 0) =
-  PID(target, current, initP+sum(Pitch/250), initI+sum(Roll/250), initD+sum(Yaw/250))
+
+def updateBank(tgt: Tree, maxDeviation: Tree = 5, deflection: Tree = 0.3): Tree = funky {
+  if abs(deltaangle(RollAngle, tgt)) > maxDeviation then
+    ailerons := sign(RollAngle - tgt) * deflection
+  else
+    ailerons := smooth(PID(0, RollRate, 0.001, 0, 0), 0.1) + Roll
+}
+
+def setHeading(tgt: Tree, headingSetFlag: Variable | Null = null, maxDeviation: Tree = 0.5): Tree = funky {
+  val delta = freshVar()
+  val correctionAngle = freshVar()
+  val aileronDeflection = freshVar()
+  val maxBankDeviation = freshVar()
+
+  while true do
+    delta := deltaangle(tgt, Heading)
+    if abs(delta) > maxDeviation then
+      if abs(delta) < 10 then
+        correctionAngle := lerp(5, 10, 0.5)
+        aileronDeflection := 0.1
+        maxBankDeviation := 1
+      else
+        correctionAngle := 60
+        aileronDeflection := 0.3
+        maxBankDeviation := 5
+      updateBank(sign(delta) * correctionAngle, maxBankDeviation, aileronDeflection)
+      if headingSetFlag != null then
+        headingSetFlag := false
+    else
+      updateBank(0)
+      if headingSetFlag != null then
+        headingSetFlag := abs(deltaangle(RollAngle, 0)) < maxBankDeviation
+}
+
+def levelPitch: Tree = funky {
+  while true do
+    thrust := 1
+    elevators := smooth(PID(0,PitchAngle+smooth(AngleOfAttack, 0.1),0.1,0,0.1), 0.1) - Pitch
+}
+
+def waitFor(time: Tree): Tree = funky {
+  val start = freshVar()
+  start := Time
+  while Time - start < time do ()
+}
