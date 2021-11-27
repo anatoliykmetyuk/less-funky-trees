@@ -21,10 +21,10 @@ object FunkySuite extends TestSuite:
         |<Variables>
         |  <Setter variable="if_condition_3" function="(b &gt; 10.0)" activator="(!evaluationFlag_if_condition_3_4)"/>
         |  <Setter variable="evaluationFlag_if_condition_3_4" function="true" />
-        |  <Setter variable="a" function="20.0" activator="((!evaluationFlag_a_1) & if_condition_3)"/>
+        |  <Setter variable="a" function="20.0" activator="((!evaluationFlag_a_1) &amp; if_condition_3)"/>
         |  <Setter variable="evaluationFlag_a_1" function="true" activator="if_condition_3"/>
         |  <Setter variable="evaluationFlag_a_1" function="true" activator="(!if_condition_3)"/>
-        |  <Setter variable="a" function="10.0" activator="((!evaluationFlag_a_2) & (!if_condition_3))"/>
+        |  <Setter variable="a" function="10.0" activator="((!evaluationFlag_a_2) &amp; (!if_condition_3))"/>
         |  <Setter variable="evaluationFlag_a_2" function="true" activator="(!if_condition_3)"/>
         |  <Setter variable="evaluationFlag_a_2" function="true" activator="if_condition_3"/>
         |</Variables>""")
@@ -52,27 +52,27 @@ object FunkySuite extends TestSuite:
         |<Variables>
         |  <Setter variable="if_condition_7" function="(PitchRate &gt; 0.01)" activator="(!evaluationFlag_if_condition_7_10)"/>
         |  <Setter variable="evaluationFlag_if_condition_7_10" function="true" />
-        |  <Setter variable="if_condition_3" function="(Flaps &lt; 30.0)" activator="((!evaluationFlag_if_condition_3_8) & if_condition_7)"/>
+        |  <Setter variable="if_condition_3" function="(Flaps &lt; 30.0)" activator="((!evaluationFlag_if_condition_3_8) &amp; if_condition_7)"/>
         |  <Setter variable="evaluationFlag_if_condition_3_8" function="true" activator="if_condition_7"/>
-        |  <Setter variable="Flaps" function="(Flaps + 0.02)" activator="(((!evaluationFlag_Flaps_1) & if_condition_3) & if_condition_7)"/>
-        |  <Setter variable="evaluationFlag_Flaps_1" function="true" activator="(if_condition_3 & if_condition_7)"/>
-        |  <Setter variable="evaluationFlag_Flaps_1" function="true" activator="((!if_condition_3) & if_condition_7)"/>
-        |  <Setter variable="Autotrim" function="(Autotrim + 0.02)" activator="(((!evaluationFlag_Autotrim_2) & (!if_condition_3)) & if_condition_7)"/>
-        |  <Setter variable="evaluationFlag_Autotrim_2" function="true" activator="((!if_condition_3) & if_condition_7)"/>
-        |  <Setter variable="evaluationFlag_Autotrim_2" function="true" activator="(if_condition_3 & if_condition_7)"/>
+        |  <Setter variable="Flaps" function="(Flaps + 0.02)" activator="(((!evaluationFlag_Flaps_1) &amp; if_condition_3) &amp; if_condition_7)"/>
+        |  <Setter variable="evaluationFlag_Flaps_1" function="true" activator="(if_condition_3 &amp; if_condition_7)"/>
+        |  <Setter variable="evaluationFlag_Flaps_1" function="true" activator="((!if_condition_3) &amp; if_condition_7)"/>
+        |  <Setter variable="Autotrim" function="(Autotrim + 0.02)" activator="(((!evaluationFlag_Autotrim_2) &amp; (!if_condition_3)) &amp; if_condition_7)"/>
+        |  <Setter variable="evaluationFlag_Autotrim_2" function="true" activator="((!if_condition_3) &amp; if_condition_7)"/>
+        |  <Setter variable="evaluationFlag_Autotrim_2" function="true" activator="(if_condition_3 &amp; if_condition_7)"/>
         |  <Setter variable="evaluationFlag_if_condition_3_8" function="true" activator="(!if_condition_7)"/>
         |  <Setter variable="evaluationFlag_Flaps_1" function="true" activator="(!if_condition_7)"/>
         |  <Setter variable="evaluationFlag_Flaps_1" function="true" activator="(!if_condition_7)"/>
         |  <Setter variable="evaluationFlag_Autotrim_2" function="true" activator="(!if_condition_7)"/>
         |  <Setter variable="evaluationFlag_Autotrim_2" function="true" activator="(!if_condition_7)"/>
-        |  <Setter variable="if_condition_6" function="(PitchRate &lt; -0.01)" activator="((!evaluationFlag_if_condition_6_9) & (!if_condition_7))"/>
+        |  <Setter variable="if_condition_6" function="(PitchRate &lt; -0.01)" activator="((!evaluationFlag_if_condition_6_9) &amp; (!if_condition_7))"/>
         |  <Setter variable="evaluationFlag_if_condition_6_9" function="true" activator="(!if_condition_7)"/>
-        |  <Setter variable="Flaps" function="(Flaps - 0.02)" activator="(((!evaluationFlag_Flaps_4) & if_condition_6) & (!if_condition_7))"/>
-        |  <Setter variable="evaluationFlag_Flaps_4" function="true" activator="(if_condition_6 & (!if_condition_7))"/>
-        |  <Setter variable="evaluationFlag_Flaps_4" function="true" activator="((!if_condition_6) & (!if_condition_7))"/>
-        |  <Setter variable="Flaps" function="Flaps" activator="(((!evaluationFlag_Flaps_5) & (!if_condition_6)) & (!if_condition_7))"/>
-        |  <Setter variable="evaluationFlag_Flaps_5" function="true" activator="((!if_condition_6) & (!if_condition_7))"/>
-        |  <Setter variable="evaluationFlag_Flaps_5" function="true" activator="(if_condition_6 & (!if_condition_7))"/>
+        |  <Setter variable="Flaps" function="(Flaps - 0.02)" activator="(((!evaluationFlag_Flaps_4) &amp; if_condition_6) &amp; (!if_condition_7))"/>
+        |  <Setter variable="evaluationFlag_Flaps_4" function="true" activator="(if_condition_6 &amp; (!if_condition_7))"/>
+        |  <Setter variable="evaluationFlag_Flaps_4" function="true" activator="((!if_condition_6) &amp; (!if_condition_7))"/>
+        |  <Setter variable="Flaps" function="Flaps" activator="(((!evaluationFlag_Flaps_5) &amp; (!if_condition_6)) &amp; (!if_condition_7))"/>
+        |  <Setter variable="evaluationFlag_Flaps_5" function="true" activator="((!if_condition_6) &amp; (!if_condition_7))"/>
+        |  <Setter variable="evaluationFlag_Flaps_5" function="true" activator="(if_condition_6 &amp; (!if_condition_7))"/>
         |  <Setter variable="evaluationFlag_if_condition_6_9" function="true" activator="if_condition_7"/>
         |  <Setter variable="evaluationFlag_Flaps_4" function="true" activator="if_condition_7"/>
         |  <Setter variable="evaluationFlag_Flaps_4" function="true" activator="if_condition_7"/>
@@ -101,7 +101,7 @@ object FunkySuite extends TestSuite:
         |  <Setter variable="evaluationFlag_x_9" function="true" />
         |  <Setter variable="if_condition_12" function="(x = 30.0)" activator="(!evaluationFlag_if_condition_12_13)"/>
         |  <Setter variable="evaluationFlag_if_condition_12_13" function="true" />
-        |  <Setter variable="x" function="40.0" activator="((!evaluationFlag_x_11) & if_condition_12)"/>
+        |  <Setter variable="x" function="40.0" activator="((!evaluationFlag_x_11) &amp; if_condition_12)"/>
         |  <Setter variable="evaluationFlag_x_11" function="true" activator="if_condition_12"/>
         |  <Setter variable="evaluationFlag_x_11" function="true" activator="(!if_condition_12)"/>
         |</Variables>""")
@@ -157,18 +157,18 @@ object FunkySuite extends TestSuite:
         |<Variables>
         |  <Setter variable="if_condition_5" function="(10.0 = 0.0)" activator="(!evaluationFlag_if_condition_5_10)"/>
         |  <Setter variable="evaluationFlag_if_condition_5_10" function="true" />
-        |  <Setter variable="Pitch" function="10.0" activator="((!evaluationFlag_Pitch_2) & if_condition_5)"/>
+        |  <Setter variable="Pitch" function="10.0" activator="((!evaluationFlag_Pitch_2) &amp; if_condition_5)"/>
         |  <Setter variable="evaluationFlag_Pitch_2" function="true" activator="if_condition_5"/>
         |  <Setter variable="evaluationFlag_Pitch_2" function="true" activator="(!if_condition_5)"/>
-        |  <Setter variable="Pitch" function="20.0" activator="((!evaluationFlag_Pitch_4) & (!if_condition_5))"/>
+        |  <Setter variable="Pitch" function="20.0" activator="((!evaluationFlag_Pitch_4) &amp; (!if_condition_5))"/>
         |  <Setter variable="evaluationFlag_Pitch_4" function="true" activator="(!if_condition_5)"/>
         |  <Setter variable="evaluationFlag_Pitch_4" function="true" activator="if_condition_5"/>
         |  <Setter variable="if_condition_8" function="((10.0 = 0.0)?false:true)" activator="(!evaluationFlag_if_condition_8_9)"/>
         |  <Setter variable="evaluationFlag_if_condition_8_9" function="true" />
-        |  <Setter variable="Roll" function="1.0" activator="((!evaluationFlag_Roll_6) & if_condition_8)"/>
+        |  <Setter variable="Roll" function="1.0" activator="((!evaluationFlag_Roll_6) &amp; if_condition_8)"/>
         |  <Setter variable="evaluationFlag_Roll_6" function="true" activator="if_condition_8"/>
         |  <Setter variable="evaluationFlag_Roll_6" function="true" activator="(!if_condition_8)"/>
-        |  <Setter variable="Roll" function="20.0" activator="((!evaluationFlag_Roll_7) & (!if_condition_8))"/>
+        |  <Setter variable="Roll" function="20.0" activator="((!evaluationFlag_Roll_7) &amp; (!if_condition_8))"/>
         |  <Setter variable="evaluationFlag_Roll_7" function="true" activator="(!if_condition_8)"/>
         |  <Setter variable="evaluationFlag_Roll_7" function="true" activator="if_condition_8"/>
         |</Variables>""")
@@ -182,7 +182,7 @@ object FunkySuite extends TestSuite:
         |<Variables>
         |  <Setter variable="while_condition_3" function="(Altitude &lt;= 1000.0)" activator="(!evaluationFlag_while_condition_3_4)"/>
         |  <Setter variable="evaluationFlag_while_condition_3_4" function="true" />
-        |  <Setter variable="Pitch" function="20.0" activator="((!evaluationFlag_Pitch_2) & while_condition_3)"/>
+        |  <Setter variable="Pitch" function="20.0" activator="((!evaluationFlag_Pitch_2) &amp; while_condition_3)"/>
         |  <Setter variable="evaluationFlag_Pitch_2" function="true" activator="while_condition_3"/>
         |  <Setter variable="while_condition_3" function="(Altitude &lt;= 1000.0)" activator="(!evaluationFlag_while_condition_3_5)"/>
         |  <Setter variable="evaluationFlag_while_condition_3_5" function="true" />
@@ -203,23 +203,23 @@ object FunkySuite extends TestSuite:
         |<Variables>
         |  <Setter variable="while_condition_5" function="(Altitude &lt;= 1000.0)" activator="(!evaluationFlag_while_condition_5_6)"/>
         |  <Setter variable="evaluationFlag_while_condition_5_6" function="true" />
-        |  <Setter variable="x" function="0.0" activator="((!evaluationFlag_x_3) & while_condition_5)"/>
+        |  <Setter variable="x" function="0.0" activator="((!evaluationFlag_x_3) &amp; while_condition_5)"/>
         |  <Setter variable="evaluationFlag_x_3" function="true" activator="while_condition_5"/>
-        |  <Setter variable="while_condition_4" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_4_7) & while_condition_5)"/>
+        |  <Setter variable="while_condition_4" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_4_7) &amp; while_condition_5)"/>
         |  <Setter variable="evaluationFlag_while_condition_4_7" function="true" activator="while_condition_5"/>
-        |  <Setter variable="while_condition_4" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_4_8) & while_condition_5)"/>
+        |  <Setter variable="while_condition_4" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_4_8) &amp; while_condition_5)"/>
         |  <Setter variable="evaluationFlag_while_condition_4_8" function="true" activator="while_condition_5"/>
-        |  <Setter variable="evaluationFlag_while_condition_4_7" function="false" activator="(while_condition_4 & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_while_condition_4_8" function="false" activator="(while_condition_4 & while_condition_5)"/>
-        |  <Setter variable="while_condition_5" function="(Altitude &lt;= 1000.0)" activator="((!evaluationFlag_while_condition_5_9) & (!while_condition_4))"/>
+        |  <Setter variable="evaluationFlag_while_condition_4_7" function="false" activator="(while_condition_4 &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_4_8" function="false" activator="(while_condition_4 &amp; while_condition_5)"/>
+        |  <Setter variable="while_condition_5" function="(Altitude &lt;= 1000.0)" activator="((!evaluationFlag_while_condition_5_9) &amp; (!while_condition_4))"/>
         |  <Setter variable="evaluationFlag_while_condition_5_9" function="true" activator="(!while_condition_4)"/>
-        |  <Setter variable="evaluationFlag_while_condition_5_6" function="false" activator="((!while_condition_4) & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_x_3" function="false" activator="((!while_condition_4) & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_while_condition_4_7" function="false" activator="((!while_condition_4) & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_while_condition_4_8" function="false" activator="((!while_condition_4) & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_while_condition_4_7" function="false" activator="((!while_condition_4) & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_while_condition_4_8" function="false" activator="((!while_condition_4) & while_condition_5)"/>
-        |  <Setter variable="evaluationFlag_while_condition_5_9" function="false" activator="((!while_condition_4) & while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_5_6" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_x_3" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_4_7" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_4_8" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_4_7" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_4_8" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
+        |  <Setter variable="evaluationFlag_while_condition_5_9" function="false" activator="((!while_condition_4) &amp; while_condition_5)"/>
         |</Variables>""")
     }
 
@@ -235,26 +235,26 @@ object FunkySuite extends TestSuite:
         |<Variables>
         |  <Setter variable="while_condition_9" function="(Altitude &lt;= 1000.0)" activator="(!evaluationFlag_while_condition_9_10)"/>
         |  <Setter variable="evaluationFlag_while_condition_9_10" function="true" />
-        |  <Setter variable="x" function="0.0" activator="((!evaluationFlag_x_5) & while_condition_9)"/>
+        |  <Setter variable="x" function="0.0" activator="((!evaluationFlag_x_5) &amp; while_condition_9)"/>
         |  <Setter variable="evaluationFlag_x_5" function="true" activator="while_condition_9"/>
-        |  <Setter variable="while_condition_6" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_6_11) & while_condition_9)"/>
+        |  <Setter variable="while_condition_6" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_6_11) &amp; while_condition_9)"/>
         |  <Setter variable="evaluationFlag_while_condition_6_11" function="true" activator="while_condition_9"/>
-        |  <Setter variable="while_condition_6" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_6_12) & while_condition_9)"/>
+        |  <Setter variable="while_condition_6" function="(Pitch &lt;= 12345.0)" activator="((!evaluationFlag_while_condition_6_12) &amp; while_condition_9)"/>
         |  <Setter variable="evaluationFlag_while_condition_6_12" function="true" activator="while_condition_9"/>
-        |  <Setter variable="evaluationFlag_while_condition_6_11" function="false" activator="(while_condition_6 & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_while_condition_6_12" function="false" activator="(while_condition_6 & while_condition_9)"/>
-        |  <Setter variable="x" function="50.0" activator="(((!evaluationFlag_x_8) & (!while_condition_6)) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_x_8" function="true" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="while_condition_9" function="(Altitude &lt;= 1000.0)" activator="((!evaluationFlag_while_condition_9_13) & (!while_condition_6))"/>
+        |  <Setter variable="evaluationFlag_while_condition_6_11" function="false" activator="(while_condition_6 &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_6_12" function="false" activator="(while_condition_6 &amp; while_condition_9)"/>
+        |  <Setter variable="x" function="50.0" activator="(((!evaluationFlag_x_8) &amp; (!while_condition_6)) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_x_8" function="true" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="while_condition_9" function="(Altitude &lt;= 1000.0)" activator="((!evaluationFlag_while_condition_9_13) &amp; (!while_condition_6))"/>
         |  <Setter variable="evaluationFlag_while_condition_9_13" function="true" activator="(!while_condition_6)"/>
-        |  <Setter variable="evaluationFlag_while_condition_9_10" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_x_5" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_while_condition_6_11" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_while_condition_6_12" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_while_condition_6_11" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_while_condition_6_12" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_x_8" function="false" activator="((!while_condition_6) & while_condition_9)"/>
-        |  <Setter variable="evaluationFlag_while_condition_9_13" function="false" activator="((!while_condition_6) & while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_9_10" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_x_5" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_6_11" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_6_12" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_6_11" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_6_12" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_x_8" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
+        |  <Setter variable="evaluationFlag_while_condition_9_13" function="false" activator="((!while_condition_6) &amp; while_condition_9)"/>
         |</Variables>""")
     }
 
@@ -272,22 +272,22 @@ object FunkySuite extends TestSuite:
         |  <Setter variable="evaluationFlag_x_7" function="true" />
         |  <Setter variable="if_condition_11" function="(x &gt; 5.0)" activator="(!evaluationFlag_if_condition_11_15)"/>
         |  <Setter variable="evaluationFlag_if_condition_11_15" function="true" />
-        |  <Setter variable="while_condition_10" function="(x &gt; 0.0)" activator="((!evaluationFlag_while_condition_10_13) & if_condition_11)"/>
+        |  <Setter variable="while_condition_10" function="(x &gt; 0.0)" activator="((!evaluationFlag_while_condition_10_13) &amp; if_condition_11)"/>
         |  <Setter variable="evaluationFlag_while_condition_10_13" function="true" activator="if_condition_11"/>
-        |  <Setter variable="x" function="(x - 1.0)" activator="(((!evaluationFlag_x_9) & while_condition_10) & if_condition_11)"/>
-        |  <Setter variable="evaluationFlag_x_9" function="true" activator="(while_condition_10 & if_condition_11)"/>
-        |  <Setter variable="while_condition_10" function="(x &gt; 0.0)" activator="((!evaluationFlag_while_condition_10_14) & if_condition_11)"/>
+        |  <Setter variable="x" function="(x - 1.0)" activator="(((!evaluationFlag_x_9) &amp; while_condition_10) &amp; if_condition_11)"/>
+        |  <Setter variable="evaluationFlag_x_9" function="true" activator="(while_condition_10 &amp; if_condition_11)"/>
+        |  <Setter variable="while_condition_10" function="(x &gt; 0.0)" activator="((!evaluationFlag_while_condition_10_14) &amp; if_condition_11)"/>
         |  <Setter variable="evaluationFlag_while_condition_10_14" function="true" activator="if_condition_11"/>
-        |  <Setter variable="evaluationFlag_while_condition_10_13" function="false" activator="(while_condition_10 & if_condition_11)"/>
-        |  <Setter variable="evaluationFlag_x_9" function="false" activator="(while_condition_10 & if_condition_11)"/>
-        |  <Setter variable="evaluationFlag_while_condition_10_14" function="false" activator="(while_condition_10 & if_condition_11)"/>
+        |  <Setter variable="evaluationFlag_while_condition_10_13" function="false" activator="(while_condition_10 &amp; if_condition_11)"/>
+        |  <Setter variable="evaluationFlag_x_9" function="false" activator="(while_condition_10 &amp; if_condition_11)"/>
+        |  <Setter variable="evaluationFlag_while_condition_10_14" function="false" activator="(while_condition_10 &amp; if_condition_11)"/>
         |  <Setter variable="evaluationFlag_while_condition_10_13" function="true" activator="(!if_condition_11)"/>
         |  <Setter variable="evaluationFlag_x_9" function="true" activator="(!if_condition_11)"/>
         |  <Setter variable="evaluationFlag_while_condition_10_14" function="true" activator="(!if_condition_11)"/>
         |  <Setter variable="evaluationFlag_while_condition_10_13" function="true" activator="(!if_condition_11)"/>
         |  <Setter variable="evaluationFlag_x_9" function="true" activator="(!if_condition_11)"/>
         |  <Setter variable="evaluationFlag_while_condition_10_14" function="true" activator="(!if_condition_11)"/>
-        |  <Setter variable="x" function="0.0" activator="((!evaluationFlag_x_12) & (!while_condition_10))"/>
+        |  <Setter variable="x" function="0.0" activator="((!evaluationFlag_x_12) &amp; (!while_condition_10))"/>
         |  <Setter variable="evaluationFlag_x_12" function="true" activator="(!while_condition_10)"/>
         |</Variables>""")
     }
