@@ -21,7 +21,7 @@ def updateBank(tgt: Tree, maxDeviation: Tree = 5, deflection: Tree = 0.3): Tree 
     ailerons := smooth(PID(0, RollRate, 0.001, 0, 0), 0.1) + Roll
 }
 
-def setHeading(tgt: Tree, headingSetFlag: Variable | Null = null, maxDeviation: Tree = 0.5): Tree = funky {
+def setHeading(tgt: Tree, headingSetFlag: Variable = freshVar(), maxDeviation: Tree = 0.5): Tree = funky {
   val delta = freshVar()
   val correctionAngle = freshVar()
   val aileronDeflection = freshVar()
@@ -39,12 +39,10 @@ def setHeading(tgt: Tree, headingSetFlag: Variable | Null = null, maxDeviation: 
         aileronDeflection := 0.3
         maxBankDeviation := 5
       updateBank(sign(delta) * correctionAngle, maxBankDeviation, aileronDeflection)
-      if headingSetFlag != null then
-        headingSetFlag := false
+      headingSetFlag := false
     else
       updateBank(0)
-      if headingSetFlag != null then
-        headingSetFlag := abs(deltaangle(RollAngle, 0)) < maxBankDeviation
+      headingSetFlag := abs(deltaangle(RollAngle, 0)) < maxBankDeviation
 }
 
 def levelPitch: Tree = funky {

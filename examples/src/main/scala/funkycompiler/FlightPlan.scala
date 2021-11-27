@@ -7,10 +7,11 @@ import stdlib.*
 
 @main def FlightPlan = program(testPlane) {
   val headingSet = Variable("headingSet")
+  val hdgVar = Variable("hdg")
   headingSet := false
-  levelPitch & {
-    setHeading(60, headingSet) | { while !headingSet do () ; waitFor(10) }
-    setHeading(-60, headingSet) | { while !headingSet do () ;  waitFor(10) }
-    setHeading(0, headingSet)
-  }
+  levelPitch & (for hdg <- 0 to 360 by 90 yield {
+    hdgVar := hdg
+    (setHeading(hdg, headingSet) | { while !headingSet do () ; waitFor(5) }): Tree
+  })
+  setHeading(0)
 }

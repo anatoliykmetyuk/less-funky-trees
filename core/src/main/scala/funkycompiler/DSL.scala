@@ -47,8 +47,10 @@ extension (f: Function) def apply(values: Tree*) =
 extension (ts: Seq[Tree]) def sumTrees =
   ts.foldLeft(0: Tree) { case (accum, t) => accum + t }
 
-inline def program(plane: File)(inline expr: Any): Unit =
-  val xml = funky(expr).compile
+inline def program(plane: File, debugTrees: Boolean = false)(inline expr: Any): Unit =
+  val tree = funky(expr)
+  if debugTrees then println(tree)
+  val xml = tree.compile
   writeVariables(plane, xml)
 
 private var freshVarCounter = 0
