@@ -25,8 +25,8 @@ extension (n: Tree)
   def !==(t: Tree) = BinaryOp(n, t, "!=")
   def ===(t: Tree) = BinaryOp(n, t, "=")
 
-  def &(t: Tree) = BinaryOp(n, t, "&amp;")
-  def |(t: Tree) = BinaryOp(n, t, "|")
+  def &&(t: Tree) = BinaryOp(n, t, "&amp;")
+  def ||(t: Tree) = BinaryOp(n, t, "|")
 
   def unary_! = UnaryOp(n, "!")
 end extension

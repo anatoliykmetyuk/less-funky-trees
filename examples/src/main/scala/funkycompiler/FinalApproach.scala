@@ -21,7 +21,7 @@ import stdlib.*
 
     if PitchAngle < maxAllowedPitch then
       elevators := elevators + elevatorsStep
-    else if PitchAngle > 5 & elevators > 0 then
+    else if PitchAngle > 5 && elevators > 0 then
       elevators := elevators - elevatorsStep
     elevators := clamp01(elevators)
 
