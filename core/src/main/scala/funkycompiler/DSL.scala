@@ -29,6 +29,9 @@ extension (n: Tree)
   def ||(t: Tree) = BinaryOp(n, t, "|")
 
   def unary_! = UnaryOp(n, "!")
+
+  def & (t: Tree) = ParallelAnd(n :: t :: Nil)
+  def | (t: Tree) = ParallelOr (n :: t :: Nil)
 end extension
 
 extension (v: Variable)

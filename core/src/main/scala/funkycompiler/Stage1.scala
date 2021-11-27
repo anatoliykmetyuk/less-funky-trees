@@ -22,6 +22,7 @@ def funkyImpl(expr: Expr[Any])(using Quotes): Expr[s3.Tree] =
       case t: Term if t.is[Boolean] => '{booleanToConst(${t.asExprOf[Boolean]})}
       case t: Term if t.is[Int] => '{intToConst(${t.asExprOf[Int]})}
       case t: Term if t.is[Double] => '{doubleToConst(${t.asExprOf[Double]})}
+      case t: Term if t.is[Unit] => '{intToConst(0)}
       case t => t.asExprOf[s3.Tree]
 
   end extension

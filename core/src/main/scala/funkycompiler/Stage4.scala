@@ -38,8 +38,8 @@ object stage4:
 
   extension (e: Expr)
     def unary_! = UnaryOp(e, "!")
-    def & (e2: Expr) = BinaryOp(e, e2, "&amp;")
-    def | (e2: Expr) = BinaryOp(e, e2, "|")
+    def && (e2: Expr) = BinaryOp(e, e2, "&amp;")
+    def || (e2: Expr) = BinaryOp(e, e2, "|")
 
   extension (vd: VarDef) def simplify: VarDef = vd match
     case VarDef(name, expr, condition) => VarDef(name, expr.simplify, condition.simplify)
