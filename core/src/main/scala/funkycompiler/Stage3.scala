@@ -147,7 +147,7 @@ object stage3:
 
     def setEvaluationFlag(value: Boolean): List[s4.VarDef] =
       vds.collect { case s4.VarDef(name, _, _) if name.startsWith("evaluationFlag_") =>
-        s4.VarDef(name, s4.Const(value), s4.Const(true)) }
+        s4.VarDef(name, s4.Const(value), s4.Const(true)) }.distinct
 
   extension (ts: List[Tree])
     def allEvaluated: s4.Expr = ts.foldLeft(s4.Const(true): s4.Expr) {
