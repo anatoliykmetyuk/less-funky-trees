@@ -3,6 +3,7 @@ package examples
 
 import stage3.{ Tree, Variable }
 import stdlib.*
+import planes.TestPlane.{ file => testPlane, * }
 
 
 @main def FinalApproach = program(testPlane) {

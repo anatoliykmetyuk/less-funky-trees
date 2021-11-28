@@ -3,10 +3,9 @@ package examples
 
 import stage3.{ Tree, Variable }
 import stdlib.*
+import planes.Pidgin.{ file => pidgin, * }
 
 
-@main def LevelFlight = program(testPlane) {
-  while true do
-    elevators := smooth(PID(0,PitchAngle+smooth(AngleOfAttack, 0.1),0.1,0,0.1), 0.1) + Pitch
-    thrust := 1
+@main def LevelFlight = program(pidgin) {
+  setLevelPitch
 }

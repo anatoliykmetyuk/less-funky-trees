@@ -3,6 +3,7 @@ package examples
 
 import stage3.*
 import stdlib.*
+import planes.TestPlane.{ file => testPlane, * }
 
 
 @main def FlightPlan = program(testPlane) {
