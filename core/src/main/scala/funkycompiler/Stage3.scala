@@ -58,9 +58,11 @@ object stage3:
       case ParallelOr(ts) => ts.flatMap { t => t.defs.whileTrue(!ts.filter(_ != t).atLeastOneEvaluated) }
       case t@While(cnd, body) =>
         val (bodyEvaluatedDefs, bodyEvaluatedRef) = memoise("whileBodyEvaluated", body.evaluated)
+        val bodyDefs = body.defs
         val loopedDefs =
           t.updateMemoisedCondition.defs ++
-            body.defs.whileTrue(t.memoisedCondition) ++
+            bodyDefs.whileTrue(t.memoisedCondition) ++
+            bodyDefs.disableEvaluation.whileTrue(!t.memoisedCondition) ++
             t.updateMemoisedCondition.defs.whileAfter(body) ++
             bodyEvaluatedDefs
 
