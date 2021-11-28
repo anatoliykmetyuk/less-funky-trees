@@ -1,7 +1,18 @@
 package funkycompiler
 
 object stage4:
-  sealed trait Tree
+  sealed trait Tree:
+    override def toString = this match
+      case Const(x) => x.toString
+      case VarRef(n) => n
+      case BinaryOp(rhs, lhs, sign) => s"$rhs $sign $lhs"
+      case UnaryOp(rhs, sign) => s"${sign}$rhs"
+      case If(cnd, lhs, rhs) => s"($cnd) ? ($lhs) : ($rhs)"
+      case Call(name, args) => s"$name(${args.mkString(",")})"
+
+      case VarDef(name, expr, cnd) => s"$name := $expr IF $cnd"
+      case VarDefs(vds) => vds.mkString("\n")
+
   case class VarDefs(defs: List[VarDef]) extends Tree
   case class VarDef(name: String, expr: Expr, condition: Expr) extends Tree
 
