@@ -8,7 +8,7 @@ import planes.Pidgin.{ file => pidgin, * }
 
 @main def HeadingSet = program(pidgin) {
   while true do
-    bank(-80)
+    maintainBank(-80)
 
   // setLevelPitch //& setHeading(-60, maxCorrectionAngle = 85)
 }
