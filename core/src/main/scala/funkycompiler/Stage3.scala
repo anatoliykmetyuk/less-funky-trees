@@ -57,16 +57,17 @@ object stage3:
       case ParallelAnd(ts) => ts.flatMap(_.defs)
       case ParallelOr(ts) => ts.flatMap { t => t.defs.whileTrue(!ts.filter(_ != t).atLeastOneEvaluated) }
       case t@While(cnd, body) =>
+        // Memoise body evaluation status because allowReevaluation will change it before it has a chance to complete
         val (bodyEvaluatedDefs, bodyEvaluatedRef) = memoise("whileBodyEvaluated", body.evaluated)
         val bodyDefs = body.defs
         val loopedDefs =
           t.updateMemoisedCondition.defs ++
             bodyDefs.whileTrue(t.memoisedCondition) ++
-            bodyDefs.disableEvaluation.whileTrue(!t.memoisedCondition) ++
-            t.updateMemoisedCondition.defs.whileAfter(body) ++
-            bodyEvaluatedDefs
+            bodyDefs.disableEvaluation.whileTrue(!t.memoisedCondition)
 
-        loopedDefs ++ loopedDefs.allowReevaluation.whileTrue(bodyEvaluatedRef && t.memoisedCondition)
+        loopedDefs ++ bodyEvaluatedDefs ++
+        bodyEvaluatedDefs.allowReevaluation.whileTrue(t.memoisedCondition) ++
+        loopedDefs.allowReevaluation.whileTrue(bodyEvaluatedRef && t.memoisedCondition)
 
     /**
      * Defines what it means for a tree to be fully evaluated.
