@@ -58,16 +58,16 @@ object stage3:
       case ParallelOr(ts) => ts.flatMap { t => t.defs.whileTrue(!ts.filter(_ != t).atLeastOneEvaluated) }
       case t@While(cnd, body) =>
         // Memoise body evaluation status because allowReevaluation will change it before it has a chance to complete
-        val (bodyEvaluatedDefs, bodyEvaluatedRef) = memoise("whileBodyEvaluated", body.evaluated)
+        val memoisedBodyEvaluatedName = freshVarName(s"memoised_whileBodyEvaluated_")
         val bodyDefs = body.defs
         val loopedDefs =
           t.updateMemoisedCondition.defs ++
             bodyDefs.whileTrue(t.memoisedCondition) ++
             bodyDefs.disableEvaluation.whileTrue(!t.memoisedCondition)
-
-        loopedDefs ++ bodyEvaluatedDefs ++
-        bodyEvaluatedDefs.allowReevaluation.whileTrue(t.memoisedCondition) ++
-        loopedDefs.allowReevaluation.whileTrue(bodyEvaluatedRef && t.memoisedCondition)
+        val controlFlowDefs =
+          s4.VarDef(memoisedBodyEvaluatedName, body.evaluated, s4.Const(true)) ::
+          loopedDefs.allowReevaluation.whileTrue(s4.VarRef(memoisedBodyEvaluatedName) && t.memoisedCondition)
+        loopedDefs ++ controlFlowDefs
 
     /**
      * Defines what it means for a tree to be fully evaluated.
@@ -107,21 +107,16 @@ object stage3:
 
   extension (vd: s4.VarDef)
     /** Evaluate `vd` only if `t` is evaluated. */
-    def whileAfter(t: Tree): s4.VarDef = vd.copy(condition = vd.condition && t.evaluated)
+    def whileAfter(t: Tree): s4.VarDef = vd.whileTrue(t.evaluated)
 
-    /** Evaluate `vd` only when `cnd`'s result is `true`. */
+    /**
+     * Evaluate `vd` only when `cnd`'s result is `true`.
+     * When calling it, ensure that `vd` does not change `cnd`
+     * (use memoisation if such a change is needed).
+     */
     def whileTrue(cnd: s4.Expr): s4.VarDef =
       vd.copy(condition = vd.condition && cnd)
   end extension
-
-  def memoise(prefix: String, t: s4.Expr): (List[s4.VarDef], s4.Expr) =
-    val varName = freshVarName(s"memoised_${prefix}_")
-    val evaluationFlag = freshEvaluationFlag(varName)
-    val defs = List(
-      s4.VarDef(varName, t, !evaluationFlag),
-      s4.VarDef(evaluationFlag.name, s4.Const(true), s4.Const(true))
-    )
-    defs -> s4.VarRef(varName)
 
   def freshEvaluationFlag(prefix: String) =
     s4.VarRef(freshVarName(s"evaluationFlag_${prefix}_"))
