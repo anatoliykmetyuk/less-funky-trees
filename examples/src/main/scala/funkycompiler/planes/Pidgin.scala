@@ -10,8 +10,7 @@ object Pidgin:
 
   def setLevelPitch: Tree = funky {
     while true do
-      elevators := smooth(PID(0,PitchAngle+smooth(AngleOfAttack, 0.1),
-        0.1,0,0.05), 1)
+      elevators := PID(0,PitchAngle,0.1,0,0.05)
   }
 
   def maintainBank(bnk: Tree) = funky {
