@@ -22,8 +22,7 @@ val flightpath: List[(Double, Double)] = List(
 @main def KrakabloaRace = program(pidgin) {
   thrust := 1
   setLevelPitch | waitFor(5)
-  for case ((lat, lon), id) <- flightpath.zipWithIndex yield
-    Variable("waypoint") := id
+  for case (lat, lon) <- flightpath yield
     goToCoordinates(lat, lon)
   while Altitude < 1400 do
     elevators := PID(30, PitchAngle, 0.1, 0, 0.05)
